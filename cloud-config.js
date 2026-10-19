@@ -2,5 +2,5 @@
 // Never paste a Supabase service_role key here.
 window.CANDLE_CLOUD = {
   url: "https://jrlwhikmfcpsbbglixrx.supabase.co",
-  anonKey: ""
+  anonKey: "sb_publishable_6IDCJ8LHDwvdgb6tUQPMQQ_4XLAVX0n"
 };
