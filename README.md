@@ -1,17 +1,29 @@
-# Candle — Learn trading, one day at a time
+# Candle — Build financial judgment, one lesson at a time
 
-Native iPhone educational game built with SwiftUI. Focus: evidence-based financial literacy, risk management, short interactive lessons and simulated trading (no real-money trading).
+The source currently in this repository is a responsive **browser app**, not an Xcode project. The SwiftUI starter previously described here is not present. There is no live brokerage integration, real-money trading or implemented paid subscription.
 
-## Starter project
-The initial SwiftUI source package is available in the ChatGPT conversation as `CandleStarter.zip`. Copy the contents of its `CandleStarter/` folder into this repository, preserving `Candle/`, `CandleTests/`, and `Docs/`.
+## Run
 
-## Development status
-- Initial starter source drafted, including five-tab navigation, introductory lessons, position sizing, local XP and streaks.
-- **Not yet compiled in Xcode or tested on an iOS simulator.**
-- No live trading, brokerage integration, or paid subscription functionality implemented.
-- Lesson claims require source review before public release.
+Serve this directory with a static web server and open `index.html`. Deploy `curriculum.js` alongside it. The app keeps progress in browser local storage. Optional Supabase leaderboard configuration is in `cloud-config.js`; backend setup is in `supabase/leaderboard.sql`.
 
-## Next milestone
-Import the starter sources, create an Xcode iOS App target named Candle, include `lessons.json` as a bundled resource, build and run in iPhone Simulator, and add automated tests and CI.
+## Curriculum
 
-This project is educational and does not provide investment advice.
+- 150 stable lesson slots, including 30 foundations and 40 stages in each of three career paths.
+- 47 concept banks with **141 distinct, authored questions**, appearing in 450 question placements. Each lesson has three different facets and task styles. Career rounds intentionally revisit the bank; they do not claim four levels of increasing academic difficulty.
+- Qualitative scenarios, claim critiques and reasoning/evidence tasks use a consistent tap-to-answer interface. No lesson requires a calculator. Existing arcade math remains optional.
+- Individual explanations, qualitative hints and external source links support review. Progress, avatars, Home/Learn separation, XP, streaks, energy, ranks and the optional leaderboard remain in place.
+
+Read [curriculum rationale, sources and limitations](docs/CURRICULUM.md) and the [editorial review protocol](docs/EDITORIAL.md) before adding content.
+
+## Validate
+
+Node 20+; no package installation or third-party test dependencies required:
+
+```sh
+node scripts/validate-curriculum.cjs
+node --test tests/*.test.cjs
+```
+
+Equivalent npm commands: `npm run validate:curriculum` and `npm test`. GitHub Actions runs both checks. Tests execute the real application scripts against a small DOM boundary, including completion of all 150 slots; they are not visual browser or native-iOS tests.
+
+This is an educational prototype. Source-informed content is not institutional endorsement or evidence that the app improves financial outcomes.

@@ -1,0 +1,9 @@
+{
+  "name": "candle-curriculum",
+  "private": true,
+  "scripts": {
+    "test": "node --test tests/*.test.cjs",
+    "validate:curriculum": "node scripts/validate-curriculum.cjs"
+  },
+  "engines": { "node": ">=20" }
+}
