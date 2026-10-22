@@ -27,7 +27,7 @@ Build a single HTML download that includes every local script/style:
 node scripts/build-preview.cjs ./preview/index.html
 ```
 
-Extract and open that file in a normal browser. Local files do not provide a stable email-auth callback or shareable invitation URL; use the deployed HTTPS app for account testing. Full mobile browser and native iOS visual QA remain pending. The app is not ready for App Store submission yet.
+Extract and open that file in a normal browser. Local files do not provide a stable email-auth callback or shareable invitation URL; use the deployed HTTPS app for account testing. Selected screens were checked at 320/390/430-pixel browser widths; the complete real-device and native iOS matrix remains pending. The app is not ready for App Store submission yet.
 
 ## Validate
 

@@ -11,7 +11,8 @@ avatarSVG=function(size=76){return CandleCharacter.svg(state.avatar,size)};
 function hasPlus(){return CandleProduct.plusActive(socialModel.entitlement,cloudUser?.id)}
 function productStatus(){return productMessage?'<p class="product-message" role="status">'+esc(productMessage)+'</p>':''}
 function productHeader(title,back='overview'){return '<div class="product-heading"><div><button class="product-back" onclick="openProfilePage(\''+back+'\')">← Back</button><h2>'+esc(title)+'</h2></div></div>'}
-function openProfilePage(page){profilePage=page;productMessage='';tab='Profile';lesson=null;render()}
+function productScrollTop(){window.scrollTo?.({top:0,left:0,behavior:'auto'})}
+function openProfilePage(page){profilePage=page;productMessage='';tab='Profile';lesson=null;render();productScrollTop()}
 function emptyPeople(title,copy){return '<div class="empty-state"><div class="empty-icon" aria-hidden="true">♧</div><h3>'+esc(title)+'</h3><p>'+esc(copy)+'</p></div>'}
 function accountGate(copy='Sign in to connect with people you know.') {
   return '<section class="card"><h3>Your learning, together</h3><p class="product-note">'+esc(copy)+'</p><form class="product-form" onsubmit="event.preventDefault();productSignIn()"><label for="accountEmail">Email address</label><input class="product-input" id="accountEmail" type="email" autocomplete="email" required placeholder="you@example.com"><button class="btn" type="submit" '+(productBusy?'disabled':'')+'>Email me a sign-in link</button><small class="product-note">We’ll email a secure sign-in link. You can keep learning without an account.</small></form></section>';
@@ -172,12 +173,13 @@ renderProfile=function(){
   app.innerHTML=(pages[profilePage]||renderProfileHome)();
 };
 const productGo=go;
-go=function(page){if(page==='Profile')profilePage='overview';productGo(page)};
+go=function(page){if(page==='Profile')profilePage='overview';productGo(page);productScrollTop()};
 const productAdvance=advance;
 advance=function(){
   const completingUser=cloudUser?.id;
   const completed=lesson!==null&&checked&&question===lessons[lesson].qs.length-1;
   productAdvance();
+  productScrollTop();
   if(completed&&lesson===null){
     const date=CandleProduct.day(new Date());
     if(!state.dailyLessons.includes(date))state.dailyLessons.push(date);
@@ -194,11 +196,11 @@ const productEnergyUI=updateEnergyUI;
 updateEnergyUI=function(){productEnergyUI();if(hasPlus()){const el=document.getElementById('energyTop');if(el){el.textContent='∞ Candle+';el.setAttribute('aria-label','Candle Plus: unlimited energy')}}};
 const productStart=start;
 start=function(index){
-  if(!hasPlus())return productStart(index);
+  if(!hasPlus()){productStart(index);if(lesson===index)productScrollTop();return}
   // Reuse the existing validation, locking and help setup. A verified member
   // bypasses only the energy gate; restore the underlying free-plan reservoir.
   const energy=state.energy,energyAt=state.energyAt;state.energy=ENERGY_MAX;
-  try{productStart(index)}finally{state.energy=energy;state.energyAt=energyAt;save();updateEnergyUI()}
+  try{productStart(index);if(lesson===index)productScrollTop()}finally{state.energy=energy;state.energyAt=energyAt;save();updateEnergyUI()}
 };
 const productEnergyInfo=showEnergyInfo;
 showEnergyInfo=function(){if(hasPlus()){openProfilePage('plus');return}productEnergyInfo()};
