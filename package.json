@@ -3,7 +3,8 @@
   "private": true,
   "scripts": {
     "test": "node --test tests/*.test.cjs",
-    "validate:curriculum": "node scripts/validate-curriculum.cjs"
+    "validate:curriculum": "node scripts/validate-curriculum.cjs",
+    "build:preview": "node scripts/build-preview.cjs"
   },
   "engines": { "node": ">=20" }
 }

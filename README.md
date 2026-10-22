@@ -15,6 +15,20 @@ Serve this directory with a static web server and open `index.html`. Deploy `cur
 
 Read [curriculum rationale, sources and limitations](docs/CURRICULUM.md) and the [editorial review protocol](docs/EDITORIAL.md) before adding content.
 
+## Profile, friends and Candle+
+
+Profile now contains Settings → Sources, following/followers, a Find My Friends screen, shared daily streaks, an original vector character studio and Candle+ signup. A verified account can start a server-issued, non-renewing seven-day unlimited-energy preview after backend setup. Paid iOS subscriptions are not implemented or sold here.
+
+Apply `supabase/social-plus.sql` after the original schema in staging and deploy the account-deletion function before enabling the connected features. The SQL was not applied to the live project in this session. Account-free character editing, sources and lessons work locally; real follows/streaks/preview entitlements require the backend. See [product behavior and App Store release gates](docs/PRODUCT-AND-RELEASE.md).
+
+Build a single HTML download that includes every local script/style:
+
+```sh
+node scripts/build-preview.cjs ./preview/index.html
+```
+
+Extract and open that file in a normal browser. Local files do not provide a stable email-auth callback or shareable invitation URL; use the deployed HTTPS app for account testing. Full mobile browser and native iOS visual QA remain pending. The app is not ready for App Store submission yet.
+
 ## Validate
 
 Node 20+; no package installation or third-party test dependencies required:

@@ -6,22 +6,7 @@ const fs=require('node:fs');
 const vm=require('node:vm');
 const path=require('node:path');
 const {validate}=require('../scripts/validate-curriculum.cjs');
-function boot(saved) {
-  const storage=new Map(saved?[['candle-browser-v2',JSON.stringify(saved)]]:[]);
-  function element(){return {innerHTML:'',textContent:'',style:{setProperty(){}},dataset:{},classList:{toggle(){}},setAttribute(){},appendChild(){},addEventListener(){},insertAdjacentElement(){},querySelector(){return element()}}}
-  const elements=Object.fromEntries(['app','nav','xpTop','energyTop'].map(id=>[id,element()]));
-  const alerts=[];
-  const context=vm.createContext({console,Date,Math,JSON,Number,String,Boolean,Object,Array,Set,Map,
-    localStorage:{getItem:k=>storage.get(k)||null,setItem:(k,v)=>storage.set(k,v)},
-    document:{getElementById:id=>elements[id]||null,createElement:element,body:element(),readyState:'loading',addEventListener(){}},
-    window:{},location:{origin:'http://localhost',pathname:'/'},setInterval(){},setTimeout(){},alert:x=>alerts.push(x)});
-  const root=path.join(__dirname,'..');
-  vm.runInContext(fs.readFileSync(path.join(root,'curriculum.js'),'utf8'),context);
-  const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
-  const script=[...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)].map(m=>m[1]).join('\n');
-  vm.runInContext(script,context);
-  return {run:code=>vm.runInContext(code,context),elements,storage,alerts};
-}
+const {boot}=require('./helpers/app.cjs');
 test('actual app has 150 mapped lessons, passing quality gates, and distinct Home/Learn',()=>{
   const app=boot();
   assert.deepEqual(validate(app.run('lessons')),[]);
@@ -40,8 +25,8 @@ test('all 150 lessons render, grade, finish and store versioned scores at actual
     assert.doesNotMatch(app.elements.app.innerHTML,/type="number"/);
     for(let q=0;q<3;q++){
       app.run('choose(lessons[lesson].qs[question].correct);check()');
-      assert.match(app.elements.app.innerHTML,/Explore the source material/);
-      assert.match(app.elements.app.innerHTML,/https:\/\//);
+      assert.match(app.elements.app.innerHTML,/Correct!/);
+      assert.doesNotMatch(app.elements.app.innerHTML,/Explore the source material|Read the source material/);
       app.run('advance()');
     }
     assert.equal(app.run('lesson'),null);
@@ -79,15 +64,15 @@ test('energy, unlock rules, hints, avatar, optional arcade and profile remain av
   assert.equal(app.run('state.energy'),14);assert.equal(app.run('helpUsed'),2);
   assert.doesNotMatch(app.run('topicHelp(lessons[30],lessons[30].qs[0]).join(" ")'),/formula|calculate|decimal/);
   app.run("go('Play')");assert.match(app.elements.app.innerHTML,/Position|Chart|Arcade/i);
-  app.run("go('Profile')");assert.match(app.elements.app.innerHTML,/Make your trader yours/);
+  app.run("go('Profile');openProfilePage('character')");assert.match(app.elements.app.innerHTML,/Make your trader yours/);
   app.run('state.energy=0;start(30)');assert.equal(app.run('lesson'),null);
 });
 test('first completion still sends the stable stage ID to cloud; replay does not',async()=>{
   const app=boot();
   app.run('globalThis.calls=[];cloudUser={id:"test"};cloud={rpc:async(name,args)=>{calls.push({name,args});return {data:null,error:null}}};start(30);for(let i=0;i<3;i++){choose(lessons[lesson].qs[question].correct);check();advance()}');
   await Promise.resolve();
-  assert.equal(app.run('calls.length'),1);assert.equal(app.run('calls[0].name'),'candle_complete_stage');
+  assert.equal(app.run('calls.filter(c=>c.name==="candle_complete_stage").length'),1);assert.equal(app.run('calls[0].name'),'candle_complete_stage');
   assert.equal(app.run('calls[0].args.p_stage_id'),30);assert.equal(app.run('calls[0].args.p_perfect'),true);
   app.run('start(30);for(let i=0;i<3;i++){choose(lessons[lesson].qs[question].correct);check();advance()}');
-  await Promise.resolve();assert.equal(app.run('calls.length'),1);
+  await Promise.resolve();assert.equal(app.run('calls.filter(c=>c.name==="candle_complete_stage").length'),1);
 });

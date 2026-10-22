@@ -40,7 +40,7 @@ Sources inform mechanisms and editorial choices. They do not validate these part
 
 ## Traceability and coverage
 
-Each question records `concept`, `facet`, `format`, `sources`, `explain` and two qualitative hints. `CandleCurriculum.banks` is the source of truth. Source IDs resolve to named HTTPS references shown after answering and in the completion support link. References supply background, not verbatim answers to fictional scenarios. Broad sources support core mechanisms; more specific sources are attached for execution, charts, biases and data snooping.
+Each question records `concept`, `facet`, `format`, `sources`, `explain` and two qualitative hints. `CandleCurriculum.banks` is the source of truth. Source IDs resolve to named HTTPS references in Profile → Settings → Sources & learning standards, alongside the concepts they inform. References supply background, not verbatim answers to fictional scenarios. Broad sources support core mechanisms; more specific sources are attached for execution, charts, biases and data snooping.
 
 | Bank IDs | Primary coverage |
 | --- | --- |
