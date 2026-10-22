@@ -5,9 +5,10 @@ let productMessage='',productBusy=false,productEpoch=0;
 let socialModel={accountId:null,profile:null,following:[],followers:[],blocked:[],search:[],entitlement:null,ready:false};
 let selectedContact=null;
 Object.assign(avatarChoices,CandleCharacter.choices);
-state.avatar={...state.avatar,...CandleCharacter.normalized(state.avatar)};
+if(state.avatar.wardrobeVersion!==3){state.avatar.clothing=0;state.avatar.wardrobeVersion=3}
+state.avatar={...state.avatar,...CandleCharacter.normalized(state.avatar,rankInfo().index)};
 state.dailyLessons ||= [];
-avatarSVG=function(size=76){return CandleCharacter.svg(state.avatar,size)};
+avatarSVG=function(size=76){return CandleCharacter.svg(state.avatar,size,rankInfo().index)};
 function hasPlus(){return CandleProduct.plusActive(socialModel.entitlement,cloudUser?.id)}
 function productStatus(){return productMessage?'<p class="product-message" role="status">'+esc(productMessage)+'</p>':''}
 function productHeader(title,back='overview'){return '<div class="product-heading"><div><button class="product-back" onclick="openProfilePage(\''+back+'\')">← Back</button><h2>'+esc(title)+'</h2></div></div>'}
@@ -69,7 +70,7 @@ async function personAction(action,index,collection){
 }
 function renderProfileHome(){
   const name=socialModel.profile?.display_name||state.avatar.name,mutual=socialModel.following.filter(p=>p.mutual),best=Math.max(0,...mutual.map(p=>p.streak));
-  return '<div class="profile-shell"><div class="profile-topline"><div><div class="eyebrow">YOUR CORNER</div><h2>Profile</h2></div><button class="icon-button" onclick="openProfilePage(\'settings\')" aria-label="Settings">⚙</button></div><section class="profile-hero"><div><div class="eyebrow">'+(hasPlus()?'CANDLE+ MEMBER':'YOUR DAILY SPARK')+'</div><h2>'+esc(name)+'</h2><p>'+(socialModel.profile?.username?'@'+esc(socialModel.profile.username):'A little wiser, one lesson at a time.')+'</p><button class="soft-button" onclick="openProfilePage(\'character\')">Edit character</button></div>'+avatarSVG(132)+'</section><div class="social-counts"><button onclick="showPeople(\'following\')"><strong>'+socialModel.following.length+'</strong><small>Following</small></button><button onclick="showPeople(\'followers\')"><strong>'+socialModel.followers.length+'</strong><small>Followers</small></button><button onclick="showPeople(\'following\')"><strong>'+best+'</strong><small>Best friend streak</small></button></div><div class="profile-actions"><button class="btn" onclick="openProfilePage(\'find\')">＋ Add friends</button><button class="soft-button" onclick="showPeople(\'following\')">Your friend streaks</button></div><div class="product-stats"><div><strong>'+state.xp+'</strong><small>Total XP</small></div><div><strong>'+state.streak+'</strong><small>Day streak</small></div><div><strong>'+state.done.length+'</strong><small>Lessons completed</small></div></div><section class="streak-card"><h3>Better together</h3><p>Follow each other, then finish a lesson each day. Your shared streak grows only when both of you show up.</p><small class="product-note">Friend days reset at midnight UTC. Personal streaks use your device’s local day.</small></section>'+(!cloudUser?accountGate():'')+'<section class="plus-card"><div class="eyebrow">CANDLE +</div><h3>Keep your curiosity going.</h3><p>Unlimited learning energy. The same thoughtful lessons, at your own pace.</p><button class="btn" onclick="openProfilePage(\'plus\')">'+(hasPlus()?'Manage Candle+':'Explore Candle+')+'</button></section>'+productStatus()+'</div>';
+  return '<div class="profile-shell"><div class="profile-topline"><div><div class="eyebrow">YOUR CORNER</div><h2>Profile</h2></div><button class="icon-button" onclick="openProfilePage(\'settings\')" aria-label="Settings">⚙</button></div><section class="profile-hero"><div><div class="eyebrow">'+(hasPlus()?'CANDLE+ · '+esc(rankInfo().name):esc(rankInfo().name))+'</div><h2>'+esc(name)+'</h2><p>'+(socialModel.profile?.username?'@'+esc(socialModel.profile.username):'A little wiser, one lesson at a time.')+'</p><button class="soft-button" onclick="openProfilePage(\'character\')">Edit character</button></div>'+avatarSVG(132)+'</section><div class="social-counts"><button onclick="showPeople(\'following\')"><strong>'+socialModel.following.length+'</strong><small>Following</small></button><button onclick="showPeople(\'followers\')"><strong>'+socialModel.followers.length+'</strong><small>Followers</small></button><button onclick="showPeople(\'following\')"><strong>'+best+'</strong><small>Best friend streak</small></button></div><div class="profile-actions"><button class="btn" onclick="openProfilePage(\'find\')">＋ Add friends</button><button class="soft-button" onclick="showPeople(\'following\')">Your friend streaks</button></div><div class="product-stats"><div><strong>'+state.xp+'</strong><small>Total XP</small></div><div><strong>'+state.streak+'</strong><small>Day streak</small></div><div><strong>'+state.done.length+'</strong><small>Lessons completed</small></div></div><section class="streak-card"><h3>Better together</h3><p>Follow each other, then finish a lesson each day. Your shared streak grows only when both of you show up.</p><small class="product-note">Friend days reset at midnight UTC. Personal streaks use your device’s local day.</small></section>'+(!cloudUser?accountGate():'')+'<section class="plus-card"><div class="eyebrow">CANDLE +</div><h3>Keep your curiosity going.</h3><p>Unlimited learning energy. The same thoughtful lessons, at your own pace.</p><button class="btn" onclick="openProfilePage(\'plus\')">'+(hasPlus()?'Manage Candle+':'Explore Candle+')+'</button></section>'+productStatus()+'</div>';
 }
 function showPeople(which){peopleTab=which;openProfilePage('people')}
 function renderPeople(){
@@ -162,12 +163,44 @@ async function restorePlus(){
 }
 function managePlus(){if(socialModel.entitlement?.source==='preview'){productMessage='Your free preview ends automatically. There is no payment to cancel.';renderProfile()}else if(window.CandleNative?.manageSubscriptions)window.CandleNative.manageSubscriptions();else{productMessage='Manage an Apple subscription in your iPhone Settings → your name → Subscriptions.';renderProfile()}}
 function renderCharacter(){
-  const labels={hairStyle:'Hair style',skin:'Skin tone',hair:'Hair color',face:'Face shape',eyes:'Eye color',brows:'Brows',expression:'Expression',clothing:'Outfit style',outfit:'Outfit color',accessory:'Accessories',background:'Backdrop'};
+  const labels={hairStyle:'Hair style',skin:'Skin tone',hair:'Hair color',face:'Face shape',eyes:'Eye color',brows:'Brows',expression:'Expression',clothing:'Rank wardrobe',outfit:'Cap color',accessory:'Accessories',background:'Backdrop'};
   const colors=['skin','hair','eyes','outfit','background'].includes(characterTab);
-  return productHeader('Make your trader yours')+'<div class="character-controls"><div class="character-stage">'+avatarSVG(190)+'</div><p class="character-preview-note">Original Candle character · changes save on this device</p><div class="character-tabs" role="group" aria-label="Character categories">'+Object.entries(labels).map(([key,label])=>'<button class="'+(key===characterTab?'active':'')+'" onclick="setCharacterTab(\''+key+'\')" aria-pressed="'+(key===characterTab)+'">'+label+'</button>').join('')+'</div><section class="card" style="margin:0"><h3>'+labels[characterTab]+'</h3><div class="character-options">'+avatarChoices[characterTab].map((value,i)=>'<button class="character-option '+(state.avatar[characterTab]===i?'selected':'')+'" onclick="setCharacterChoice('+i+')" aria-pressed="'+(state.avatar[characterTab]===i)+'" aria-label="'+labels[characterTab]+' '+(i+1)+'">'+(colors?'<span class="color-dot" style="background:'+value+'"></span><span>Shade '+(i+1)+'</span>':esc(value))+'</button>').join('')+'</div></section><section class="card" style="margin:0"><label for="avatarName">Character name</label><input class="product-input" id="avatarName" maxlength="18" value="'+esc(state.avatar.name)+'"><button class="btn" style="width:100%;margin-top:12px" onclick="renameAvatar()">Save name</button></section></div>';
+  const rank=rankInfo(),isWardrobe=characterTab==='clothing';
+  const options=isWardrobe?CandleCharacter.wardrobe.map((fit,i)=>{
+    const unlocked=CandleCharacter.unlocked(i,rank.index);
+    return '<button class="character-option wardrobe-option '+(state.avatar.clothing===i?'selected':'')+'" onclick="setCharacterChoice('+i+')" '+(unlocked?'':'disabled')+' aria-pressed="'+(state.avatar.clothing===i)+'" aria-label="'+esc(fit.name)+(unlocked?' — available':' — unlock at '+levelNames[fit.rank])+'">'+CandleCharacter.svg({...state.avatar,clothing:i},68,fit.rank)+'<strong>'+esc(fit.name)+'</strong><small>'+(unlocked?'Unlocked':esc(levelNames[fit.rank])+' · '+(fit.rank*850)+' points')+'</small></button>';
+  }).join(''):avatarChoices[characterTab].map((value,i)=>'<button class="character-option '+(state.avatar[characterTab]===i?'selected':'')+'" onclick="setCharacterChoice('+i+')" aria-pressed="'+(state.avatar[characterTab]===i)+'" aria-label="'+labels[characterTab]+' '+(i+1)+'">'+(colors?'<span class="color-dot" style="background:'+value+'"></span><span>Shade '+(i+1)+'</span>':esc(value))+'</button>').join('');
+  return productHeader('Make your trader yours')+'<div class="character-controls"><div class="character-stage">'+avatarSVG(170)+'</div><div class="wardrobe-rank"><span class="eyebrow">'+esc(rank.name)+'</span><p>'+esc(CandleCharacter.wardrobe[state.avatar.clothing].name)+'</p><button class="soft-button" onclick="setCharacterTab(\'clothing\')">View rank wardrobe</button></div><div class="character-tabs" role="group" aria-label="Character categories">'+Object.entries(labels).map(([key,label])=>'<button class="'+(key===characterTab?'active':'')+'" onclick="setCharacterTab(\''+key+'\')" aria-pressed="'+(key===characterTab)+'">'+label+'</button>').join('')+'</div><section class="card" style="margin:0"><h3>'+labels[characterTab]+'</h3>'+(isWardrobe?'<p class="product-note">Everyone starts in a black suit and tie. Earn meme ranks through lessons to unlock the rest. Outfits are earned, never paid.</p>':'')+'<div class="character-options '+(isWardrobe?'wardrobe-options':'')+'">'+options+'</div></section><section class="card" style="margin:0"><label for="avatarName">Character name</label><input class="product-input" id="avatarName" maxlength="18" value="'+esc(state.avatar.name)+'"><button class="btn" style="width:100%;margin-top:12px" onclick="renameAvatar()">Save name</button></section></div>';
 }
 function setCharacterTab(key){if(!avatarChoices[key])return;characterTab=key;renderProfile()}
-function setCharacterChoice(index){if(!Number.isInteger(index)||index<0||index>=avatarChoices[characterTab].length)return;state.avatar[characterTab]=index;save();renderProfile()}
+function setCharacterChoice(index){if(!Number.isInteger(index)||index<0||index>=avatarChoices[characterTab].length)return;if(characterTab==='clothing'&&!CandleCharacter.unlocked(index,rankInfo().index))return;state.avatar[characterTab]=index;save();renderProfile()}
+function renderAIReview(l,q){
+  if(!checked)return '';
+  const text=CandleAI.prompt(l,q,CandleCurriculum.sources);
+  return '<aside class="ai-review-tray" aria-label="Optional AI study helpers"><div class="ai-review-heading"><strong>Go deeper with AI</strong><span>Choose your tutor ↗</span></div><div class="ai-review-providers">'+CandleAI.providers.map(provider=>{
+    const target=CandleAI.destination(provider.id,text);
+    return '<a class="ai-provider ai-'+provider.id+'" href="'+esc(target.url)+'" target="_blank" rel="noopener noreferrer external" referrerpolicy="no-referrer" onclick="aiProviderClick(\''+provider.id+'\')" aria-label="Study this question with '+provider.name+' — opens another app" title="'+(target.prefilled?'Open with the lesson prompt where supported':'Copy prompt and open; paste it in the chat')+'">'+CandleAIIcons[provider.id]+'<span>'+provider.name+'</span></a>';
+  }).join('')+'</div><small class="ai-review-note">Opens your AI with lesson content; it may start a chat. Gemini uses copy + open.</small><details class="ai-prompt-details" id="aiPromptDetails"><summary>View / copy study prompt</summary><label class="sr-only" for="aiStudyPrompt">Study prompt to paste into an AI chat</label><textarea id="aiStudyPrompt" rows="7" readonly>'+esc(text)+'</textarea><button class="soft-button" onclick="copyAIStudyPrompt()">Copy prompt</button></details><span class="ai-review-status" id="aiReviewStatus" role="status" aria-live="polite"></span><small class="ai-review-note">AI can make mistakes. Compare its explanation with the lesson; ask it to flag assumptions.</small></aside>';
+}
+async function copyAIStudyPrompt(){
+  if(lesson===null||!checked)return false;
+  const q=lessons[lesson].qs[question],text=CandleAI.prompt(lessons[lesson],q,CandleCurriculum.sources),id=q.id;
+  try{
+    if(!navigator.clipboard?.writeText)throw Error('Clipboard unavailable');
+    await navigator.clipboard.writeText(text);
+    if(lesson!==null&&lessons[lesson].qs[question].id===id){const status=document.getElementById('aiReviewStatus');if(status)status.textContent='Study prompt copied. Paste it if your AI chat opens blank.'}
+    return true;
+  }catch(error){
+    if(lesson!==null&&lessons[lesson].qs[question].id===id){const box=document.getElementById('aiPromptDetails');if(box)box.open=true;const status=document.getElementById('aiReviewStatus');if(status)status.textContent='Copy wasn’t available. Select the prompt text above and copy it manually.'}
+    return false;
+  }
+}
+function aiProviderClick(id){
+  if(lesson===null||!checked||!CandleAI.providers.some(p=>p.id===id))return;
+  // The normal anchor opens the provider synchronously. Copying is a fallback,
+  // never a background API call or an attempted chat submission by Candle.
+  void copyAIStudyPrompt();
+}
 renderProfile=function(){
   const pages={overview:renderProfileHome,settings:renderSettings,sources:renderSources,people:renderPeople,find:renderFind,search:renderSearch,account:renderAccount,privacy:renderPrivacy,plus:renderPlus,plusSignup:renderPlusSignup,character:renderCharacter};
   app.innerHTML=(pages[profilePage]||renderProfileHome)();
@@ -176,11 +209,14 @@ const productGo=go;
 go=function(page){if(page==='Profile')profilePage='overview';productGo(page);productScrollTop()};
 const productAdvance=advance;
 advance=function(){
+  const priorRank=rankInfo().index;
   const completingUser=cloudUser?.id;
   const completed=lesson!==null&&checked&&question===lessons[lesson].qs.length-1;
   productAdvance();
   productScrollTop();
   if(completed&&lesson===null){
+    const newRank=rankInfo().index;
+    if(newRank>priorRank){const fit=CandleCharacter.wardrobe[newRank];app.innerHTML+='<section class="card outfit-unlock"><div class="eyebrow">OUTFIT UNLOCKED</div><h3>'+esc(levelNames[newRank])+'</h3>'+CandleCharacter.svg({...state.avatar,clothing:newRank},82,newRank)+'<p>'+esc(fit.name)+'</p><button class="btn" onclick="openProfilePage(\'character\');setCharacterTab(\'clothing\')">Try your new fit</button></section>'}
     const date=CandleProduct.day(new Date());
     if(!state.dailyLessons.includes(date))state.dailyLessons.push(date);
     state.dailyLessons=state.dailyLessons.slice(-400);save();

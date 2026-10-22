@@ -31,6 +31,8 @@ Extract and open that file in a normal browser. Local files do not provide a sta
 
 ## Validate
 
+Characters now start in a black suit and tie, with smaller heads and visible hands. The existing 12 meme ranks unlock suits, finance vests, tweed, quarter-zips and flip-flops. After an answer is revealed, an optional AI tray offers provider links plus the full copyable study prompt. Browser pre-filling is best-effort; Gemini uses copy-and-open. See [wardrobe and AI handoff details](docs/AI-HANDOFF.md).
+
 Node 20+; no package installation or third-party test dependencies required:
 
 ```sh

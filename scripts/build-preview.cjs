@@ -2,7 +2,7 @@ const fs=require('node:fs'),path=require('node:path');
 const root=path.resolve(__dirname,'..');
 function buildPreview(){
   let html=fs.readFileSync(path.join(root,'index.html'),'utf8');
-  for(const file of ['product-core.js','character.js','curriculum.js','cloud-config.js','product.js']){
+  for(const file of ['product-core.js','ai-icons.js','ai-review.js','character.js','curriculum.js','cloud-config.js','product.js']){
     const tag=`<script src="${file}"></script>`,source=fs.readFileSync(path.join(root,file),'utf8');
     if(!html.includes(tag)||/<\/script/i.test(source))throw Error('Unsafe or missing script '+file);
     html=html.replace(tag,()=>`<script>\n${source}\n</script>`);

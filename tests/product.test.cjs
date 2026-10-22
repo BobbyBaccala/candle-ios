@@ -36,7 +36,7 @@ test('source directory maps references to concrete concept objectives',()=>{
 test('all character choices normalize old/malformed data and produce original vector markup',()=>{
   for(const [key,values]of Object.entries(Character.choices))for(let i=0;i<values.length;i++){
     const svg=Character.svg({[key]:i},120);
-    assert.match(svg,/viewBox="0 0 160 200"/);assert.match(svg,/aria-label=/);
+    assert.match(svg,/viewBox="0 0 160 240"/);assert.match(svg,/aria-label=/);
     assert.doesNotMatch(svg,/undefined|NaN|<image|<filter|clipPath|id=|http/);
   }
   const normalized=Character.normalized({face:-1,hairStyle:100,outfit:'red'});
