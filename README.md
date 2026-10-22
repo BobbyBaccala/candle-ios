@@ -8,8 +8,17 @@ Serve this directory with a static web server and open `index.html`. Deploy `cur
 
 ## Curriculum
 
-- 150 stable lesson slots, including 30 foundations and 40 stages in each of three career paths.
-- 47 concept banks with **141 distinct, authored questions**, appearing in 450 question placements. Each lesson has three different facets and task styles. Career rounds intentionally revisit the bank; they do not claim four levels of increasing academic difficulty.
+Compete includes eight corporate meme leagues, from Intern Energy to CEO of
+Doing the Work. First-round accuracy and distinct lessons determine points;
+replays cannot farm them. Free lesson rounds end with an immediately closable
+Candle+ promotion, followed by profile and league progress. Optional spaced
+review suggestions appear on Learn. Research, exact counts, score rules and
+release limitations are in [the implementation notes](docs/RETENTION-AND-LEAGUES.md).
+Apply `supabase/leagues.sql` after the existing migrations to enable shared
+friend league scores. It has not been deployed to the live database here.
+
+- **293 lessons and 856 distinct qualitative questions**, a 507% increase in distinct questions from the previous 141. There are 1,165 placements; intentional foundation review is counted separately from new material.
+- The original 150 IDs remain intact. Another 143 five-question case files cover practical personal finance, investment analysis and trading-risk/evidence literacy. Foundation sets have three reasoning tasks; case sets have five distinct facets and styles. The interface remains tap-to-answer.
 - Qualitative scenarios, claim critiques and reasoning/evidence tasks use a consistent tap-to-answer interface. No lesson requires a calculator. Existing arcade math remains optional.
 - Individual explanations, qualitative hints and external source links support review. Progress, avatars, Home/Learn separation, XP, streaks, energy, ranks and the optional leaderboard remain in place.
 

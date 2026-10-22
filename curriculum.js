@@ -13,6 +13,22 @@ const CandleCurriculum = (() => {
     bias: {title:'CFA Institute — The Behavioral Biases of Individuals',url:'https://www.cfainstitute.org/insights/professional-learning/refresher-readings/2026/the-behavioral-biases-of-individuals'},
     testing: {title:'Sullivan, Timmermann & White (1999) — Data-snooping and trading rules',url:'https://onlinelibrary.wiley.com/doi/10.1111/0022-1082.00163'}
   };
+  Object.assign(sources,{
+   consumer:{title:'CFPB — Consumer resources (US; verify local rules)',url:'https://www.consumerfinance.gov/consumer-tools/'},
+   cards:{title:'CFPB — Credit card terms and repayment',url:'https://www.consumerfinance.gov/consumer-tools/credit-cards/'},
+   fraud:{title:'CFPB — Fraud, phishing and identity theft',url:'https://www.consumerfinance.gov/consumer-tools/fraud/'},
+   bank:{title:'CFPB — Bank accounts, availability and overdrafts',url:'https://www.consumerfinance.gov/consumer-tools/bank-accounts/'},
+   auto:{title:'CFPB — Comparing auto financing',url:'https://www.consumerfinance.gov/consumer-tools/auto-loans/'},
+   accounting:{title:'Principles of Finance §4.1 — Cash versus accrual',url:'https://openstax.org/books/principles-finance/pages/4-1-cash-versus-accrual-accounting'},
+   cashflow:{title:'Principles of Finance §5.6 — Operating cash flow',url:'https://openstax.org/books/principles-finance/pages/5-6-operating-cash-flow-and-free-cash-flow-to-the-firm-fcff'},
+   capital:{title:'Principles of Finance §17.1 — Capital structure',url:'https://openstax.org/books/principles-finance/pages/17-1-the-concept-of-capital-structure'},
+   equityvalue:{title:'Principles of Finance §11.1 — Stock valuation approaches',url:'https://openstax.org/books/principles-finance/pages/11-1-multiple-approaches-to-stock-valuation'},
+   products:{title:'SEC Investor.gov — Investment product risks and disclosures',url:'https://www.investor.gov/introduction-investing/investing-basics/investment-products'},
+   options:{title:'SEC — An Introduction to Options (2026 update)',url:'https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-bulletins-63'},
+   leveraged:{title:'SEC — Leveraged and Inverse ETF daily objectives',url:'https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-alerts/sec'},
+   sessions:{title:'SEC — Extended-hours trading risks',url:'https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-bulletins-42'}
+  });
+
   const banks = {};
   function add(id, objective, refs, rows) { banks[id] = {objective, sources:refs.split(' '), rows}; }
   add('budget','Build a flexible spending plan around resources and priorities.','oecd capability',[
@@ -264,8 +280,8 @@ const CandleCurriculum = (() => {
     trading:['sizing','payoff','spread','pnl','leverage','body','wick','expectancy','ruin','journal']
   };
   const foundation = ['assets','spread','orders','liquidity','fees','body','timeframe','support','volatility','averages','sizing','sizing','payoff','diversify','drawdown','accounting','balance','market-cap','valuation','etf','inflation','rates','compound','economy','central-bank','allocation','correlation','expectancy','bias','journal'];
-  const formats = ['decision','diagnosis','evidence'];
-  const labels = {decision:'Choose a response',diagnosis:'Challenge a claim',evidence:'Reason it through'};
+  const formats = ['decision','diagnosis','evidence','explanation','counterfactual'];
+  const labels = {decision:'Choose a response',diagnosis:'Challenge a claim',evidence:'Reason it through',explanation:'Explain the mechanism',counterfactual:'Revisit a changed situation'};
   function hash(text) { let h=2166136261;for(const c of text)h=Math.imul(h^c.charCodeAt(0),16777619);return h>>>0; }
   function questions(bankId, lessonId, round=0) {
     return banks[bankId].rows.map((r, i) => {

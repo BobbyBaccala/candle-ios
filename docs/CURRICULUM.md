@@ -60,6 +60,16 @@ Stage indices 0–149, path membership/order, browser storage key and server sta
 
 The four career rounds reuse the same bank with independently permuted option order. They are called practice rounds, not progressively harder tiers. Repetition across lessons preserves the existing 40-stage path structure; it is not adaptive or scheduled spaced repetition. Foundation lessons can share a bank with career lessons. Within a lesson, no prompt, concept/facet pair or concept/task-style pair repeats. Unique placement IDs do not imply 450 unique prompts.
 
+## Corporate climb expansion
+
+The figures above describe the preserved 150-slot base. The app now appends
+143 five-question case files: 293 total lessons, 190 banks, 856 distinct
+questions and 1,165 placements. This adds 507% distinct question content.
+See [retention, sources, league scoring and deployment notes](RETENTION-AND-LEAGUES.md)
+for the current scope and remaining validation work. Personal-finance cases
+also broaden coverage of insurance, borrowing contracts and digital safety;
+they do not claim comprehensive jurisdiction-specific guidance.
+
 ## Validation and remaining limitations
 
 The dependency-free gate checks unique IDs, normalized duplicate and near-duplicate prompts, repeated facets/styles, distinct options, valid answer indices, substantive explanations, source resolution, hints, likely calculator phrasing and curriculum-wide answer-position balance. Deterministic per-question permutations avoid the old always-first answer bias and simple cyclic patterns. Mutation tests demonstrate gate failures for representative regressions. Semantic labels and token similarity are aids, not proof of semantic uniqueness, factual correctness or a single defensible answer.

@@ -30,8 +30,9 @@ test('username validation and follow links reject unsafe or unsupported values',
   assert.equal(P.followLink('https://example.test','<script>'),null);
 });
 test('source directory maps references to concrete concept objectives',()=>{
+  require('../scripts/validate-curriculum.cjs').fixture();
   const groups=P.sourceGroups(C);assert.equal(groups.length,Object.keys(C.sources).length);
-  assert.ok(groups.every(g=>g.concepts.length&&g.concepts.every(c=>c.objective&&c.facets.length===3)));
+  assert.ok(groups.every(g=>g.concepts.length&&g.concepts.every(c=>c.objective&&[3,5].includes(c.facets.length))));
 });
 test('all character choices normalize old/malformed data and produce original vector markup',()=>{
   for(const [key,values]of Object.entries(Character.choices))for(let i=0;i<values.length;i++){

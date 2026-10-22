@@ -28,6 +28,7 @@ test('wardrobe UI gates outfits by learning rank and keeps cosmetic purchases ou
 test('crossing a rank boundary reveals the new fit without silently equipping it',()=>{
   const app=boot();app.run("state.xp=800;start(30);for(let i=0;i<3;i++){choose(lessons[lesson].qs[question].correct);check();advance()}");
   assert.equal(app.run('rankInfo().index'),1);assert.equal(app.run('state.avatar.clothing'),0);
+  app.run('dismissRoundOffer()');
   assert.match(app.elements.app.innerHTML,/OUTFIT UNLOCKED/);assert.match(app.elements.app.innerHTML,/Budget Goblin/);
 });
 test('the AI tray is absent before reveal and appears with four provider marks after checking',()=>{

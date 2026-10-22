@@ -7,13 +7,13 @@ const vm=require('node:vm');
 const path=require('node:path');
 const {validate}=require('../scripts/validate-curriculum.cjs');
 const {boot}=require('./helpers/app.cjs');
-test('actual app has 150 mapped lessons, passing quality gates, and distinct Home/Learn',()=>{
+test('actual app has 293 mapped lessons, passing quality gates, and distinct Home/Learn',()=>{
   const app=boot();
   assert.deepEqual(validate(app.run('lessons')),[]);
   assert.match(app.elements.app.innerHTML,/YOUR LEARNING HQ/);
   app.run("go('Learn')");
   assert.match(app.elements.app.innerHTML,/Choose your adventure/);
-  assert.match(app.elements.app.innerHTML,/four practice rounds/);
+  assert.match(app.elements.app.innerHTML,/five-question real-life cases/);
   assert.doesNotMatch(app.elements.app.innerHTML,/18 challenges/);
 });
 test('all 150 lessons render, grade, finish and store versioned scores at actual length',()=>{
@@ -33,6 +33,7 @@ test('all 150 lessons render, grade, finish and store versioned scores at actual
     assert.equal(app.run(`state.lessonScores[${i}].total`),3);
     assert.equal(app.run(`state.lessonScores[${i}].correct`),3);
     assert.equal(app.run(`state.lessonScores[${i}].curriculumVersion`),'qualitative-v1');
+    app.run('if(roundOffer)dismissRoundOffer()');
     assert.match(app.elements.app.innerHTML,/3 \/ 3 correct/);
   }
 });

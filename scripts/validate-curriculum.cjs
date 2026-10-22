@@ -1,4 +1,5 @@
 const curriculum = require('../curriculum.js');
+const cases=require('../cases.js');require('../case-data.js');require('../case-investing.js');require('../case-trading.js');
 const normalize = text => text.toLowerCase().normalize('NFKC').replace(/\d+(?:[.,]\d+)*/g,'#').replace(/[^a-z# ]/g,' ').replace(/\s+/g,' ').trim();
 const tokens = text => new Set(normalize(text).split(' ').filter(w=>w.length>3));
 function similarity(a,b) {
@@ -6,10 +7,16 @@ function similarity(a,b) {
   return union.size ? [...x].filter(w=>y.has(w)).length/union.size : 1;
 }
 function validate(lessons, sources=curriculum.sources) {
-  const errors=[],ids=new Set(),globalPrompts=new Map(),answerCounts=[0,0,0];
+  const errors=[],ids=new Set(),globalPrompts=new Map(),caseContexts=new Set(),answerCounts=[0,0,0];
   const fail=(where,message)=>errors.push(`${where}: ${message}`);
   lessons.forEach((l,li)=>{
     const where=`lesson ${li} (${l.title})`;
+    if(l.curriculumVersion==='cases-v1'){
+      const context=normalize(l.caseContext||'');
+      if(context.length<65||caseContexts.has(context))fail(where,'case context missing, too short or repeated');
+      caseContexts.add(context);
+      if(l.qs?.length!==5)fail(where,'five case reasoning facets required');
+    }
     if(!l.explain?.trim()||!l.curriculumVersion)fail(where,'missing objective or version');
     if(!Array.isArray(l.qs)||l.qs.length<3){fail(where,'at least three distinct tasks required');return}
     const prompts=new Set(),facets=new Set(),styles=new Set();
@@ -49,6 +56,7 @@ function validate(lessons, sources=curriculum.sources) {
 function fixture() {
   const lessons=Array.from({length:150},(_,i)=>({title:`slot ${i}`,career:i<30?undefined:['personal','investing','trading'][Math.floor((i-30)/40)],tier:i<30?undefined:Math.floor(((i-30)%40)/10)}));
   curriculum.install(lessons,30,Object.keys(curriculum.career).map(id=>({id,lessons:Array.from({length:10},()=>['topic'])})));
+  cases.install(lessons,curriculum);
   return lessons;
 }
 if(require.main===module) {
