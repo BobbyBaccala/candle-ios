@@ -49,6 +49,7 @@ node scripts/validate-curriculum.cjs
 node --test tests/*.test.cjs
 ```
 
-Equivalent npm commands: `npm run validate:curriculum` and `npm test`. GitHub Actions runs both checks. Tests execute the real application scripts against a small DOM boundary, including completion of all 150 slots; they are not visual browser or native-iOS tests.
+Equivalent npm commands: `npm run validate:curriculum` and `npm test`. GitHub Actions runs both checks. Tests execute the real application scripts against a small DOM boundary, including completion of all 293 slots; they are not visual browser or native-iOS tests.
 
 This is an educational prototype. Source-informed content is not institutional endorsement or evidence that the app improves financial outcomes.
+

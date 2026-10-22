@@ -66,6 +66,8 @@ test('spaced review uses expanding intervals, errors reset, and same-day replay 
 test('Learn paginates chapters, shows actual path counts, and suggests only completed due reviews',()=>{
  const a=boot();a.run("state.reviews={30:{due:1},999:{due:1}};state.done=[30];go('Learn')");
  assert.match(a.elements.app.innerHTML,/856 distinct/);assert.match(a.elements.app.innerHTML,/1\/88 stages/);
+ assert.match(a.elements.app.innerHTML,/START · 3 questions/);assert.doesNotMatch(a.elements.app.innerHTML,/lessons\[i\]/);
+ assert.match(a.run("careerStage(150,careerLessonIndices('personal'),150)"),/START · 5 questions/);
  assert.match(a.elements.app.innerHTML,/Review: Budget Builder/);assert.doesNotMatch(a.elements.app.innerHTML,/start\(999\)/);
  a.run('selectLearnChapter(4)');assert.match(a.elements.app.innerHTML,/Payday timing/);
  a.run('start(150)');assert.equal(a.run('lesson'),null);
