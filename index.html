@@ -242,7 +242,7 @@ function careerMap(){const path=careerPaths.find(p=>p.id===state.path),ids=caree
 function careerStage(i,ids,next){let complete=state.done.includes(i),locked=ids.indexOf(i)>ids.indexOf(next),pos=i===next,offset=[0,58,18,-50][ids.indexOf(i)%4];return '<div class="stage-row" style="--shift:'+offset+'px"><div class="stage-wrap">'+(pos?'<div class="walking-avatar">'+avatarSVG(58)+'</div>':"")+'<button class="stage '+(complete?"complete":locked?"locked":"current")+'" '+(locked?"disabled":"onclick=\"start("+i+")\"")+' aria-label="'+esc(lessons[i].title)+'">'+(complete?"✓":locked?"🔒":"⚡")+'</button><div class="stage-caption"><strong>'+esc(lessons[i].title)+'</strong><small>'+(complete?"Completed · Replay":locked?"Unlock by playing":"START · "+lessons[i].qs.length+" questions")+'</small></div></div></div>'}
 // Retain sequential career unlocking while sharing the qualitative lesson flow.
 const previousStart=start;
-start=function(i){if(!Number.isInteger(i)||i<0||i>=lessons.length)return;if(i>=newLessonStart){const ids=careerLessonIndices(lessons[i].career),next=ids.findIndex(id=>!state.done.includes(id));if(next>=0&&ids.indexOf(i)>next){alert('Finish the previous stage first!');return}}previousStart(i)};
+start=function(i){if(!Number.isInteger(i)||i<0||i>=lessons.length)return;if(!canStartLearningStage(i)){alert('Finish the preceding required lessons first.');return}previousStart(i)};
 renderHome=function(){careerMap()};
 renderLearn=function(){careerMap()};
 const oldProfile=renderProfile;
@@ -371,7 +371,7 @@ start=function(i){
   showEnergyInfo();return;
  }
  // Check locked career stages before spending energy.
- if(i>=newLessonStart){const ids=careerLessonIndices(lessons[i].career),next=ids.findIndex(id=>!state.done.includes(id));if(next>=0&&ids.indexOf(i)>next){alert("Finish the previous stage first!");return}}
+ if(!canStartLearningStage(i)){alert('Finish the preceding required lessons first.');return}
  const before=lesson;
  energyStartBase(i);
  if(lesson===i&&before!==i){state.energy--;if(state.energy===ENERGY_MAX-1)state.energyAt=Date.now();save();updateEnergyUI()}

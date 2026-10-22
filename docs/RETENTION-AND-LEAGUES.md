@@ -12,6 +12,11 @@ are tested; review placements are not misrepresented as new material.
 
 Existing IDs 0–149, XP, outfits, saved progress, hint and AI handoff features
 remain. IDs 150–292 are append-only; do not reorder the three case-data files.
+Ten initial foundations in each career path unlock that path's case files.
+The remaining three foundation rounds are optional review and retain their
+own sequential unlocks. New cases also unlock in sequence within their path.
+The recommended next lesson prefers fresh cases after those ten foundations,
+and chapter selection automatically follows the recommended next lesson.
 The first appended case is Payday timing; the last is The no-trade decision.
 The five tasks concern a response, risk, evidence, mechanism and changed
 conditions. All are multiple choice, with distinct reasoning formats and

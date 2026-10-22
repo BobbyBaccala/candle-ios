@@ -67,10 +67,20 @@ test('Learn paginates chapters, shows actual path counts, and suggests only comp
  const a=boot();a.run("state.reviews={30:{due:1},999:{due:1}};state.done=[30];go('Learn')");
  assert.match(a.elements.app.innerHTML,/856 distinct/);assert.match(a.elements.app.innerHTML,/1\/88 stages/);
  assert.match(a.elements.app.innerHTML,/START · 3 questions/);assert.doesNotMatch(a.elements.app.innerHTML,/lessons\[i\]/);
+ a.run('state.done=Array.from({length:10},(_,i)=>30+i)');
  assert.match(a.run("careerStage(150,careerLessonIndices('personal'),150)"),/START · 5 questions/);
+ a.run('state.done=[30]');
  assert.match(a.elements.app.innerHTML,/Review: Budget Builder/);assert.doesNotMatch(a.elements.app.innerHTML,/start\(999\)/);
  a.run('selectLearnChapter(4)');assert.match(a.elements.app.innerHTML,/Payday timing/);
  a.run('start(150)');assert.equal(a.run('lesson'),null);
+});
+test('ten foundations unlock fresh cases without requiring all repeated review rounds',()=>{
+ const a=boot();a.run('state.done=Array.from({length:10},(_,i)=>30+i)');
+ assert.equal(a.run('currentCareerLevel()'),150);
+ a.run('start(151)');assert.equal(a.run('lesson'),null);
+ a.run('start(150)');assert.equal(a.run('lesson'),150);
+ a.run("go('Learn');selectLearnChapter(1)");
+ assert.equal(a.run('canStartLearningStage(40)'),true);assert.equal(a.run('canStartLearningStage(41)'),false);
 });
 test('friend league fetch fails honestly before server deployment and never shows fabricated players',async()=>{
  const a=boot();a.run("cloudUser={id:'u'};cloud={rpc:async()=>({error:{message:'Missing migration'},data:null})};tab='Compete'");
