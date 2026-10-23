@@ -1,9 +1,16 @@
 name: Native and database acceptance
-on: [push, pull_request]
+on:
+  push:
+    branches: [main]
+  pull_request:
+concurrency:
+  group: acceptance-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 permissions:
   contents: read
 jobs:
   database:
+    timeout-minutes: 10
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -42,6 +49,7 @@ jobs:
           psql -v ON_ERROR_STOP=1 -f supabase/tests/depth-library.sql
           psql -v ON_ERROR_STOP=1 -f supabase/tests/deletion.sql
   ios:
+    timeout-minutes: 20
     runs-on: macos-15
     steps:
       - uses: actions/checkout@v4

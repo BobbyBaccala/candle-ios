@@ -11,8 +11,8 @@ final class MembershipStore: ObservableObject {
     // Configure real identifiers only after creating subscriptions in App Store Connect.
     private let ids: Set<String>
     private var listener: Task<Void, Never>?
-    init(ids: Set<String> = []) {
-        self.ids = ids
+    init(configuration: CandleConfiguration = .bundled) {
+        self.ids = configuration.purchasesConfigured ? Set(configuration.productIDs) : []
         listener = Task { [weak self] in
             for await result in StoreKit.Transaction.updates {
                 guard let self else { return }

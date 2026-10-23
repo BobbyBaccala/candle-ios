@@ -1,7 +1,7 @@
 import Foundation
 import UserNotifications
 
-// Integrate into the future iOS app target. This repository is still a web app.
+// Used by the native SwiftUI beta target and available to the trusted web bridge.
 // Call enable only from an explicit settings action; reconcile on foreground,
 // local-day/timezone changes, and after every lesson completion.
 @MainActor

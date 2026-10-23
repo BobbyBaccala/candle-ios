@@ -109,11 +109,18 @@ struct NativeSettings: View {
                 Section("Candle+") {
                     Text("Unlimited lesson energy while your subscription is active.")
                     ForEach(membership.products, id: \.id) { product in
-                        Button("\(product.displayName) · \(product.displayPrice)") { Task { await membership.purchase(product) } }.disabled(membership.busy)
+                        VStack(alignment: .leading) {
+                            Text(product.displayName).font(.headline)
+                            Text(product.description)
+                            if let period = product.subscription?.subscriptionPeriod { Text("\(product.displayPrice) / \(subscriptionPeriodText(period))") }
+                            Button("Subscribe · \(product.displayPrice)") { Task { await membership.purchase(product) } }.disabled(membership.busy)
+                        }
                     }
                     Button("Restore Purchases") { Task { await membership.restore() } }.disabled(membership.busy)
                     Button("Manage Subscriptions") { if let url = URL(string: "https://apps.apple.com/account/subscriptions") { UIApplication.shared.open(url) } }
                     if let message = membership.message { Text(message).font(.caption) }
+                    if !membership.products.isEmpty { Text("Auto-renews unless canceled in your App Store subscription settings. Payment is charged to your Apple account. Manage or cancel your plan in Manage Subscriptions.").font(.caption) }
+                    ForEach(legalLinks, id: \.0) { title, url in Link(title, destination: url) }
                 }
                 Section("Sources") {
                     Text("Source-informed practice, including contextual variants. No institutional endorsement. Financial education, not personalized advice.")
@@ -125,8 +132,24 @@ struct NativeSettings: View {
             }.navigationTitle("Settings").toolbar { Button("Done") { dismiss() } }
         }
     }
+    private var legalLinks: [(String, URL)] {
+        let c = CandleConfiguration.bundled
+        return [("Privacy policy", c.privacyURL), ("Terms of use", c.termsURL), ("Support", c.supportURL)].compactMap { title, raw in c.link(raw).map { (title, $0) } }
+    }
     private var uniqueSources: [SourceReference] {
         var seen = Set<String>()
         return learning.lessons.flatMap(\.questions).flatMap(\.sources).filter { seen.insert($0.id).inserted }.sorted { $0.title < $1.title }
     }
+}
+
+private func subscriptionPeriodText(_ period: Product.SubscriptionPeriod) -> String {
+    let unit: String
+    switch period.unit {
+    case .day: unit = "day"
+    case .week: unit = "week"
+    case .month: unit = "month"
+    case .year: unit = "year"
+    @unknown default: return "billing period"
+    }
+    return "\(period.value) \(unit)" + (period.value == 1 ? "" : "s")
 }

@@ -1,6 +1,6 @@
 # Candle — Build financial judgment, one lesson at a time
 
-The source currently in this repository is a responsive **browser app**, not an Xcode project. The SwiftUI starter previously described here is not present. There is no live brokerage integration, real-money trading or implemented paid subscription.
+The main product is a responsive **browser app**. A separate SwiftUI iOS beta target is now in `ios/`, generated with XcodeGen; it does not yet have browser feature parity. There is no live brokerage integration or real-money trading. Native StoreKit handling is implemented but purchases are disabled until real product/legal configuration and sandbox acceptance.
 
 ## Run
 
@@ -59,3 +59,9 @@ This is an educational prototype. Source-informed content is not institutional e
 ## Release operations
 
 Saved progress is validated on startup; damaged fields recover while valid history and legacy scores remain. Storage failures display a persistent status. CI also tests the actual self-contained artifact, checks an 800 kB size budget, reports its SHA-256 and uploads a preview artifact. Run `npm run check:release` for the browser candidate; `npm run check:production` intentionally fails until all documented signoffs have evidence. See [release runbook](docs/RELEASE-RUNBOOK.md) and `release-gates.json`. These checks do not deploy or certify the native app.
+
+## Native beta and backend acceptance
+
+See [native build and subscription integration](docs/NATIVE-BETA.md). Generate the native curriculum with `node scripts/export-ios.cjs` before generating the Xcode project. CI builds/tests the unsigned iOS simulator app and runs SQL migrations and acceptance suites on disposable PostgreSQL with a minimal auth contract. This is not a full Supabase auth/email or Edge Function test. No production migration or purchase was performed.
+
+Export the independent editorial queue with `node scripts/export-editorial-review.cjs review.json`. The 1,186 distinct material records cover all 7,615 placements, include sources and fingerprints, and start pending. A fingerprint detects changed content; it does not establish educational quality or approval.

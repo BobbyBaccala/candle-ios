@@ -1,5 +1,28 @@
 # Candle: implementation status and launch plan
 
+## Mitigation update — 23 October 2026
+
+A separate SwiftUI iOS beta target now exists under ios/, generated with XcodeGen.
+It exports the validated lesson library for offline native learning, integrates
+local reminders and includes StoreKit verified entitlement/purchase/restore/update
+handling. Purchases are disabled by default and require product IDs plus legal
+and support URLs. See [native scope and setup](NATIVE-BETA.md). Browser features
+are preserved; the native beta does not yet include friends, avatars, arcade or
+shared leagues. Earlier statements below about no native target describe the
+previous implementation state.
+
+Mac CI now builds and tests the unsigned simulator target. PostgreSQL CI applies
+migrations and runs social, historical league, expanded-library and deletion
+cascade suites against a minimal auth contract. It found and fixed round-validation
+SQL syntax and XP variable ambiguity. This does not test real Supabase auth,
+email callbacks, Edge Functions, production migration or backup restoration.
+The independent editorial export provides 1,186 pending distinct material records
+covering all 7,615 placements; it does not substitute for educator review.
+
+All production signoffs remain pending until staging, device, content and legal
+acceptance evidence is reviewed. No charge, live database change or App Store
+submission was performed.
+
 ## Current preview
 
 There are 1,293 lesson sets and 7,615 question placements. All sets now contain

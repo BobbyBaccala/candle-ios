@@ -31,3 +31,12 @@ final class LearningProgressTests: XCTestCase {
         XCTAssertEqual(restored.completed, [1292]); XCTAssertEqual(restored.xp, 40)
     }
 }
+
+final class NativeConfigurationTests: XCTestCase {
+    func testMissingLegalConfigurationCannotEnablePurchases() {
+        let config = CandleConfiguration(productIDs: ["test.monthly"], privacyURL: "", termsURL: "https://legal.example/terms", supportURL: "https://support.invalid")
+        XCTAssertFalse(config.purchasesConfigured)
+        XCTAssertNil(config.link("http://example.com"))
+        XCTAssertNil(config.link("https://user:password@example.com"))
+    }
+}
