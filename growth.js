@@ -49,7 +49,7 @@ advance=function(){
  save();
  roundRecap={id,correct:result.correct,total:result.total,before,oldLeague,firstScored,unlocks:app.innerHTML.match(/<section class="card outfit-unlock">[\s\S]*$/)?.[0]||''};
  if(firstScored&&cloudUser)void syncLeagueRound(id,result,cloudUser.id);
- roundOffer=!hasPlus();renderRoundEnd();
+ roundOffer=!hasPlus()&&(!state.habits||state.habits.offers==='round'||state.habits.lastOffer!==today());if(roundOffer&&state.habits){state.habits.lastOffer=today();save()}renderRoundEnd();
 };
 async function syncLeagueRound(id,result,user){
  if(cloudUser?.id!==user)return;

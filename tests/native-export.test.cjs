@@ -4,7 +4,7 @@ test('native export preserves every lesson and answer with HTTPS sources',()=>{
  execFileSync(process.execPath,['scripts/export-ios.cjs'],{cwd:require('node:path').join(__dirname,'..')});
  const data=JSON.parse(fs.readFileSync(require('node:path').join(__dirname,'../ios/Resources/curriculum.json'),'utf8'));
  assert.equal(data.length,1293);assert.equal(new Set(data.map(l=>l.id)).size,1293);
- for(const l of data){assert.ok(l.questions.length>=5&&l.questions.length<=8);for(const q of l.questions){assert.ok(q.options[q.correct]);assert.ok(q.explanation);assert.ok(q.sources.length);for(const s of q.sources)assert.equal(new URL(s.url).protocol,'https:')}}
+ for(const l of data){assert.ok(typeof l.subject==='string'&&l.subject.length);assert.ok(l.questions.length>=5&&l.questions.length<=8);for(const q of l.questions){assert.ok(q.skill);assert.ok(q.options[q.correct]);assert.ok(q.explanation);assert.ok(q.sources.length);for(const s of q.sources)assert.equal(new URL(s.url).protocol,'https:')}}
 });
 test('editorial packet covers every placement without inventing approval',()=>{
  const items=reviewPack();assert.equal(items.length,1186);assert.equal(items.reduce((n,i)=>n+i.lessonIds.length,0),7615);

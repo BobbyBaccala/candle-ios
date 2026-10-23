@@ -12,7 +12,7 @@ test('the expansion supplies 856 unique questions, 143 new cases and stable orig
  assert.equal(all[150].title,'Payday timing');assert.equal(all[292].title,'The no-trade decision');
 });
 test('every appended lesson renders all five questions and can finish at its actual length',()=>{
- const a=boot();
+ const a=boot();a.run("setOfferFrequency('round')");
  for(let id=150;id<293;id++){
   a.run(`state.done=Array.from({length:${id}},(_,i)=>i);state.energy=15;start(${id})`);
   assert.equal(a.run('lesson'),id);assert.match(a.elements.app.innerHTML,/Case file/);

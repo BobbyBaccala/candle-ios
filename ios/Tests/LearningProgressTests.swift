@@ -40,3 +40,21 @@ final class NativeConfigurationTests: XCTestCase {
         XCTAssertNil(config.link("https://user:password@example.com"))
     }
 }
+
+final class NativeHabitsTests: XCTestCase {
+    func testNoReplayRewardFarmingAndDelayedEvidence() {
+        var h = NativeHabits(); let now = Date(timeIntervalSince1970: 1800000000)
+        h.finish(1, now: now); h.finish(1, now: now); XCTAssertEqual(h.sparks, 1)
+        h.finish(2, now: now); h.finish(3, now: now); XCTAssertEqual(h.sparks, 3)
+        h.answer("concept:facet", correct: true, confidence: "sure", lessonID: 1, now: now)
+        h.answer("concept:facet", correct: true, confidence: nil, lessonID: 2, now: now.addingTimeInterval(1))
+        XCTAssertEqual(h.remembered, 0); XCTAssertEqual(h.evidence.count, 1)
+        h.answer("concept:facet", correct: true, confidence: "fair", lessonID: 2, now: now.addingTimeInterval(86402))
+        XCTAssertEqual(h.remembered, 1)
+    }
+    @MainActor func testEntireBundledLibraryLoads() {
+        let store = LearningStore(defaults: UserDefaults(suiteName: UUID().uuidString)!)
+        XCTAssertEqual(store.lessons.count, 1293)
+        XCTAssertNil(store.errorMessage)
+    }
+}

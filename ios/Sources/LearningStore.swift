@@ -3,7 +3,7 @@ import Combine
 
 struct SourceReference: Codable, Identifiable { let id: String; let title: String; let url: String }
 struct LearningQuestion: Codable, Identifiable {
-    let id: String; let prompt: String; let options: [String]; let correct: Int
+    let id: String; let skill: String; let prompt: String; let options: [String]; let correct: Int
     let explanation: String; let sources: [SourceReference]
 }
 struct LearningLesson: Codable, Identifiable {
@@ -11,6 +11,7 @@ struct LearningLesson: Codable, Identifiable {
     let questions: [LearningQuestion]
 }
 struct LearningProgress: Codable {
+    var habits: NativeHabits?
     var completed: Set<Int> = []
     var xp = 0
     var streak = 0
@@ -61,8 +62,17 @@ final class LearningStore: ObservableObject {
         persist(); return true
     }
     func finish(_ lesson: LearningLesson, perfect: Bool) {
-        progress.complete(id: lesson.id, perfect: perfect); persist()
+        progress.complete(id: lesson.id, perfect: perfect)
+        var habits = progress.habits ?? NativeHabits(); habits.finish(lesson.id); progress.habits = habits; persist()
         Task { await reconcile() }
+    }
+    func recordAnswer(_ question: LearningQuestion, correct: Bool, confidence: String?, lessonID: Int) {
+        var habits = progress.habits ?? NativeHabits()
+        habits.answer(question.skill, correct: correct, confidence: confidence, lessonID: lessonID)
+        progress.habits = habits; persist()
+    }
+    func reportQuestion(_ question: LearningQuestion) {
+        var habits = progress.habits ?? NativeHabits(); habits.reports[question.id] = "ambiguous"; progress.habits = habits; persist()
     }
     func reconcile() async {
         progress.replenish()

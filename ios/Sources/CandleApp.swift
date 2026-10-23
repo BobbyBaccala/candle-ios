@@ -21,11 +21,32 @@ struct NativeLibrary: View {
     @State private var query = ""
     @State private var activeLesson: LearningLesson?
     @State private var settings = false
+    @AppStorage("native.goal") private var goal = "everyday"
+    private var orderedSubjects: [String] {
+        let preferred = ["everyday":"Personal Finance", "investing":"Long-Term Investing", "work":"Corporate Finance"][goal]
+        return Array(Set(learning.lessons.map(\.subject))).sorted { a, b in
+            if a == preferred { return true }; if b == preferred { return false }; return a < b
+        }
+    }
     var body: some View {
         NavigationStack {
             List {
                 Section { Text("\(learning.progress.xp) XP · \(learning.progress.streak) day streak · \(membership.active ? "Unlimited" : String(learning.progress.energy)) energy") }
-                ForEach(Array(Set(learning.lessons.map(\.subject))).sorted(), id: \.self) { subject in
+                Section("Daily sparks") {
+                    let habits = learning.progress.habits ?? NativeHabits()
+                    Text("\(habits.days[NativeHabits.day()]?.count ?? 0) / 3 different lessons today · \(habits.sparks) sparks")
+                    Text("One lesson earns a spark. Three earn two more. Sparks collect device-only badges and have no cash value.").font(.caption)
+                    Text(habits.sparks >= 30 ? "🏅 Consistent curiosity" : habits.sparks >= 7 ? "✨ A week of sparks" : habits.sparks > 0 ? "🕯 First spark" : "Your first spark is waiting")
+                    Text("\(habits.remembered) skills remembered after a day · \(habits.needsReview) ready to revisit").font(.caption)
+                    Picker("Your starting point", selection: $goal) {
+                        Text("Everyday money").tag("everyday"); Text("Investing").tag("investing"); Text("Work & business").tag("work"); Text("Stay sharp").tag("sharp")
+                    }
+                    if goal == "sharp" { Button("Start a refresher") {
+                        let id = habits.suggestedLesson
+                        if let lesson = learning.lessons.first(where: { $0.id == id }) ?? learning.lessons.first(where: { !learning.progress.completed.contains($0.id) }) ?? learning.lessons.first, learning.begin(plus: membership.active) { activeLesson = lesson }
+                    } }
+                }
+                ForEach(orderedSubjects, id: \.self) { subject in
                     Section(subject) {
                         ForEach(learning.lessons.filter { $0.subject == subject && (query.isEmpty || $0.title.localizedCaseInsensitiveContains(query)) }) { lesson in
                             Button { if learning.begin(plus: membership.active) { activeLesson = lesson } } label: {
@@ -56,6 +77,8 @@ struct LessonSession: View {
     @State private var revealed = false
     @State private var mistakes = 0
     @State private var finished = false
+    @State private var confidence = "none"
+    @State private var reported = false
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -71,6 +94,11 @@ struct LessonSession: View {
                         Text(lesson.title).font(.title2.bold())
                         DisclosureGroup("Learning goal") { Text(lesson.objective) }
                         Text(question.prompt).font(.title3)
+                        if !revealed {
+                            Picker("How sure are you? Optional and private", selection: $confidence) {
+                                Text("Skip").tag("none"); Text("Guessing").tag("guess"); Text("Fairly sure").tag("fair"); Text("Very sure").tag("sure")
+                            }
+                        }
                         ForEach(question.options.indices, id: \.self) { option in
                             Button { selected = option } label: {
                                 HStack { Image(systemName: selected == option ? "checkmark.circle.fill" : "circle"); Text(question.options[option]); Spacer() }.frame(minHeight: 44)
@@ -81,12 +109,19 @@ struct LessonSession: View {
                             Text(selected == question.correct ? "Correct" : "Review the reasoning").font(.headline)
                             Text(question.options[question.correct]).bold()
                             Text(question.explanation)
+                            DisclosureGroup("Sources and answer standards") {
+                                Text("Use the facts and assumptions in the question. Independent educator review is pending.")
+                                ForEach(question.sources) { source in if let url = URL(string: source.url), url.scheme == "https" { Link(source.title, destination: url) } }
+                            }
+                            Button("This seems ambiguous") { learning.reportQuestion(question); reported = true }
+                            if reported { Text("Saved on this device. Share your reports from Settings; nothing has been sent.").font(.caption) }
+
                             Button(index == lesson.questions.count - 1 ? "Finish lesson" : "Next question") {
                                 if index == lesson.questions.count - 1 { learning.finish(lesson, perfect: mistakes == 0); finished = true }
-                                else { index += 1; selected = nil; revealed = false }
+                                else { index += 1; selected = nil; revealed = false; confidence = "none"; reported = false }
                             }.buttonStyle(.borderedProminent)
                         } else {
-                            Button("Check answer") { guard selected != nil else { return }; if selected != question.correct { mistakes += 1 }; revealed = true }.buttonStyle(.borderedProminent).disabled(selected == nil)
+                            Button("Check answer") { guard selected != nil else { return }; if selected != question.correct { mistakes += 1 }; learning.recordAnswer(question, correct: selected == question.correct, confidence: confidence == "none" ? nil : confidence, lessonID: lesson.id); revealed = true }.buttonStyle(.borderedProminent).disabled(selected == nil)
                         }
                     }
                 }.padding()
@@ -128,9 +163,18 @@ struct NativeSettings: View {
                         if let url = URL(string: source.url), url.scheme == "https" { Link(source.title, destination: url) }
                     }
                 }
+                Section("Learning insights") {
+                    let habits = learning.progress.habits ?? NativeHabits()
+                    Text("\(habits.evidence.count) skills practiced · \(habits.remembered) remembered after a day")
+                    Text("Confidence stays private and does not change energy or XP. These are learning signals, not professional qualifications.").font(.caption)
+                    ShareLink("Share saved question reports", item: reportsJSON)
+                }
                 Section("Native beta") { Text("Offline learning preview. Browser progress, friends, avatars, leagues and arcade are not synchronized with this separate native beta. Purchases are disabled until App Store products and required legal pages are configured.") }
             }.navigationTitle("Settings").toolbar { Button("Done") { dismiss() } }
         }
+    }
+    private var reportsJSON: String {
+        String(data: (try? JSONEncoder().encode(learning.progress.habits?.reports ?? [:])) ?? Data(), encoding: .utf8) ?? "{}"
     }
     private var legalLinks: [(String, URL)] {
         let c = CandleConfiguration.bundled
