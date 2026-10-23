@@ -1,0 +1,6 @@
+# Generated outputs; regenerate from validated repository content.
+ios/Candle.xcodeproj/
+ios/Resources/curriculum.json
+ios/TestResults.xcresult/
+dist/
+.DS_Store
