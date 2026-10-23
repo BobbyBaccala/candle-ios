@@ -28,14 +28,19 @@ jobs:
       - run: psql -v ON_ERROR_STOP=1 -f scripts/ci/auth-contract.sql
       - name: Apply migrations in release order
         run: |
-          for file in leaderboard social-plus leagues depth-library; do
+          for file in leaderboard social-plus leagues; do
             psql -v ON_ERROR_STOP=1 -f "supabase/$file.sql"
           done
       - name: Run transaction-isolated acceptance suites
         run: |
-          for file in social-plus leagues depth-library deletion; do
+          for file in social-plus leagues; do
             psql -v ON_ERROR_STOP=1 -f "supabase/tests/$file.sql"
           done
+      - name: Upgrade to expanded library and check deletion cascades
+        run: |
+          psql -v ON_ERROR_STOP=1 -f supabase/depth-library.sql
+          psql -v ON_ERROR_STOP=1 -f supabase/tests/depth-library.sql
+          psql -v ON_ERROR_STOP=1 -f supabase/tests/deletion.sql
   ios:
     runs-on: macos-15
     steps:
