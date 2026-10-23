@@ -23,3 +23,7 @@ The native app directly integrates StreakReminderScheduler; no browser timer is 
 Native progress is stored only in this app's UserDefaults. A malformed save is copied to a local recovery key before starting a new session. There is no native account creation, cloud upload, contacts access, advertising SDK or analytics SDK. Browser account deletion and actual Supabase auth are separate acceptance work; database cascade tests do not prove HTTP deletion service behavior.
 
 No legal URL, developer identity, price, icon or review credential has been invented. Configure these before submission. The release-gates.json entries remain pending until actual evidence exists.
+
+## Automated evidence
+
+The native implementation at commit 126774e26e2dace32f8ed37b1508b97652f76c1f passed its unsigned simulator build and five native tests, and the PostgreSQL acceptance job passed: https://github.com/BobbyBaccala/candle-ios/actions/runs/39957565262 . All 80 Node tests and curriculum validation also passed. These are automated development checks; none of the production signoffs has been marked approved.

@@ -29,7 +29,7 @@ Read [curriculum rationale, sources and limitations](docs/CURRICULUM.md) and the
 
 ## Profile, friends and Candle+
 
-Profile now contains Settings → Sources, following/followers, a Find My Friends screen, shared daily streaks, an original vector character studio and Candle+ signup. A verified account can start a server-issued, non-renewing seven-day unlimited-energy preview after backend setup. Paid iOS subscriptions are not implemented or sold here.
+Profile now contains Settings → Sources, following/followers, a Find My Friends screen, shared daily streaks, an original vector character studio and Candle+ signup. A verified account can start a server-issued, non-renewing seven-day unlimited-energy preview after backend setup. The browser does not sell paid subscriptions. The separate native beta includes StoreKit handling, disabled until configured and accepted in sandbox.
 
 Apply `supabase/social-plus.sql` after the original schema in staging and deploy the account-deletion function before enabling the connected features. The SQL was not applied to the live project in this session. Account-free character editing, sources and lessons work locally; real follows/streaks/preview entitlements require the backend. See [product behavior and App Store release gates](docs/PRODUCT-AND-RELEASE.md).
 
