@@ -65,3 +65,7 @@ Saved progress is validated on startup; damaged fields recover while valid histo
 See [native build and subscription integration](docs/NATIVE-BETA.md). Generate the native curriculum with `node scripts/export-ios.cjs` before generating the Xcode project. CI builds/tests the unsigned iOS simulator app and runs SQL migrations and acceptance suites on disposable PostgreSQL with a minimal auth contract. This is not a full Supabase auth/email or Edge Function test. No production migration or purchase was performed.
 
 Export the independent editorial queue with `node scripts/export-editorial-review.cjs review.json`. The 1,186 distinct material records cover all 7,615 placements, include sources and fingerprints, and start pending. A fingerprint detects changed content; it does not establish educational quality or approval.
+
+## Daily knowledge and rewards
+
+Daily sparks, profile badges, optional confidence, private learning evidence and Stay Sharp refreshers support the bite-sized quiz loop. Browser Buddy Boost adds verified shared check-ins; no new business simulation or daily case was introduced. See [behavior and limits](docs/DAILY-LEARNING.md). All entry points stay open; insights are available to free beta users. Candle+ still grants unlimited energy.
