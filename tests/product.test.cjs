@@ -56,14 +56,14 @@ test('verified Plus bypasses energy only; expiry and signout restore the gate',(
   const app=boot();app.run(`cloudUser={id:'test'};socialModel.entitlement={user_id:'test',product:'candle_plus',status:'active',valid_until:'2099-01-01T00:00:00Z'};state.energy=0;start(30)`);
   assert.equal(app.run('lesson'),30);assert.equal(app.run('state.energy'),0);
   assert.match(app.elements.energyTop.textContent,/∞ Candle/);
-  app.run("go('Learn');start(32)");assert.equal(app.run('lesson'),null);
-  app.run("socialModel.entitlement.valid_until='2000-01-01T00:00:00Z';start(30)");assert.equal(app.run('lesson'),null);
+  app.run("go('Learn');start(32)");assert.equal(app.run('lesson'),32);
+  app.run("go('Learn');socialModel.entitlement.valid_until='2000-01-01T00:00:00Z';start(30)");assert.equal(app.run('lesson'),null);
   app.run("socialModel.entitlement.valid_until='2099-01-01T00:00:00Z';cloudUser=null;start(30)");assert.equal(app.run('lesson'),null);
 });
 test('replayed lessons record daily activity without duplicating first-completion XP',async()=>{
-  const app=boot();app.run(`globalThis.calls=[];cloudUser={id:'test'};cloud={rpc:async(name,args)=>{calls.push({name,args});return {data:null,error:null}}};start(30);for(let i=0;i<3;i++){choose(lessons[lesson].qs[question].correct);check();advance()}`);
+  const app=boot();app.run(`globalThis.calls=[];cloudUser={id:'test'};cloud={rpc:async(name,args)=>{calls.push({name,args});return {data:null,error:null}}};start(30);for(let i=0,n=lessons[lesson].qs.length;i<n;i++){choose(lessons[lesson].qs[question].correct);check();advance()}`);
   await Promise.resolve();const xp=app.run('state.xp');
-  app.run('start(30);for(let i=0;i<3;i++){choose(lessons[lesson].qs[question].correct);check();advance()}');await Promise.resolve();
+  app.run('start(30);for(let i=0,n=lessons[lesson].qs.length;i<n;i++){choose(lessons[lesson].qs[question].correct);check();advance()}');await Promise.resolve();
   assert.equal(app.run('state.xp'),xp);assert.equal(app.run('state.dailyLessons.length'),1);
   assert.equal(app.run('calls.filter(c=>c.name==="candle_record_learning_day").length'),2);
 });

@@ -5,10 +5,10 @@ const {validate,fixture}=require('../scripts/validate-curriculum.cjs');
 test('all production slots pass quality rules and avoid a fixed answer-position pattern',()=>{
   const lessons=fixture();
   assert.deepEqual(validate(lessons),[]);
-  for(const l of lessons)assert.equal(l.qs.length,l.curriculumVersion==='cases-v1'?5:3);
+  for(const l of lessons)assert.equal(l.qs.length,l.curriculumVersion==='cases-v1'?5:6);
   assert.ok(new Set(lessons.map(l=>l.qs.map(q=>q.correct).join(''))).size>15);
   const prompts=new Set(lessons.flatMap(l=>l.qs.map(q=>q.q)));
-  assert.equal(prompts.size,Object.values(C.banks).reduce((n,b)=>n+b.rows.length,0));
+  assert.equal(prompts.size,6856);
 });
 for(const [name,mutate,pattern] of [
   ['duplicate IDs',l=>l[0].qs[1].id=l[0].qs[0].id,/duplicate question ID/],

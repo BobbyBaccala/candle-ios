@@ -1,4 +1,5 @@
 const curriculum = require('../curriculum.js');
+const depth=require('../depth-curriculum.js');require('../depth-topics.js');require('../depth-topics-more.js');require('../depth-topics-planning.js');require('../depth-contexts.js');
 const cases=require('../cases.js');require('../case-data.js');require('../case-investing.js');require('../case-trading.js');
 const normalize = text => text.toLowerCase().normalize('NFKC').replace(/\d+(?:[.,]\d+)*/g,'#').replace(/[^a-z# ]/g,' ').replace(/\s+/g,' ').trim();
 const tokens = text => new Set(normalize(text).split(' ').filter(w=>w.length>3));
@@ -46,7 +47,8 @@ function validate(lessons, sources=curriculum.sources) {
       const prior=globalPrompts.get(prompt);
       if(prior&&prior!==facet)fail(loc,'same global prompt has conflicting facet labels');
       globalPrompts.set(prompt,facet);
-      for(let j=0;j<qi;j++)if(similarity(q.q,l.qs[j].q)>=0.67)fail(loc,`possible near duplicate of question ${j}`);
+      if(q.taskPrompt&&!q.q.endsWith(q.taskPrompt))fail(loc,'task stem does not match rendered prompt');
+      for(let j=0;j<qi;j++)if(similarity(q.taskPrompt||q.q,l.qs[j].taskPrompt||l.qs[j].q)>=0.67)fail(loc,`possible near duplicate of question ${j}`);
     });
   });
   const total=answerCounts.reduce((a,b)=>a+b,0);
@@ -57,6 +59,7 @@ function fixture() {
   const lessons=Array.from({length:150},(_,i)=>({title:`slot ${i}`,career:i<30?undefined:['personal','investing','trading'][Math.floor((i-30)/40)],tier:i<30?undefined:Math.floor(((i-30)%40)/10)}));
   curriculum.install(lessons,30,Object.keys(curriculum.career).map(id=>({id,lessons:Array.from({length:10},()=>['topic'])})));
   cases.install(lessons,curriculum);
+  depth.install(lessons,curriculum,[]);
   return lessons;
 }
 if(require.main===module) {

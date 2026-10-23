@@ -29,6 +29,12 @@ const CandleCurriculum = (() => {
    sessions:{title:'SEC — Extended-hours trading risks',url:'https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-bulletins-42'}
   });
 
+  Object.assign(sources,{
+    economics:{title:'CORE Econ — The Economy: choices, markets and institutions',url:'https://books.core-econ.org/the-economy-v1/book/text/01.html'},
+    retirement:{title:'CFPB — Planning for retirement (US; verify local rules)',url:'https://www.consumerfinance.gov/consumer-tools/retirement/'},
+    protection:{title:'NAIC — Consumer insurance education (US; verify local rules)',url:'https://content.naic.org/consumer'},
+    banking:{title:'CFPB — Bank accounts and services',url:'https://www.consumerfinance.gov/consumer-tools/bank-accounts/'}
+  });
   const banks = {};
   function add(id, objective, refs, rows) { banks[id] = {objective, sources:refs.split(' '), rows}; }
   add('budget','Build a flexible spending plan around resources and priorities.','oecd capability',[
