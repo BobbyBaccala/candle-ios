@@ -26,18 +26,18 @@ create or replace function public.candle_record_league_round(p_stage_id integer,
 returns void language plpgsql security definer set search_path=public,pg_temp as $$
 begin
  if auth.uid()is null then raise exception 'Sign in required';end if;
- if p_stage_id is null or p_stage_id not between 0 and 1292 or p_total is null or p_total<>case when p_stage_id between 150 and 292 then 5 else 6 end or p_correct is null or p_correct not between 0 and p_total then raise exception 'Invalid round';end if;
+ if p_stage_id is null or p_stage_id not between 0 and 1292 or p_total is null or p_total<>(case when p_stage_id between 150 and 292 then 5 else 6 end) or p_correct is null or p_correct not between 0 and p_total then raise exception 'Invalid round';end if;
  insert into candle_league_rounds(user_id,stage_id,correct,total)values(auth.uid(),p_stage_id,p_correct,p_total)on conflict do nothing;
  insert into candle_stage_completions(user_id,stage_id)values(auth.uid(),p_stage_id)on conflict do nothing;
 end $$;
 -- Extend the existing idempotent XP endpoint without changing existing IDs.
 create or replace function public.candle_complete_stage(p_stage_id integer,p_perfect boolean default false)
 returns integer language plpgsql security definer set search_path=public,pg_temp as $$
-declare points integer:=case when p_perfect then 40 else 25 end;inserted integer;
+declare award_points integer:=case when p_perfect then 40 else 25 end;inserted integer;
 begin
  if auth.uid()is null then raise exception 'Sign in required';end if;
  if p_stage_id is null or p_stage_id not between 0 and 1292 then raise exception 'Invalid stage';end if;
- insert into candle_xp_events(user_id,stage_id,points)values(auth.uid(),p_stage_id,points)on conflict do nothing returning points into inserted;
+ insert into candle_xp_events(user_id,stage_id,points)values(auth.uid(),p_stage_id,award_points)on conflict do nothing returning candle_xp_events.points into inserted;
  if inserted is not null then
   insert into candle_scores(user_id,lifetime_xp)values(auth.uid(),inserted)on conflict(user_id)do update set lifetime_xp=candle_scores.lifetime_xp+excluded.lifetime_xp,updated_at=now();
  end if;

@@ -14,7 +14,7 @@ final class MembershipStore: ObservableObject {
     init(ids: Set<String> = []) {
         self.ids = ids
         listener = Task { [weak self] in
-            for await result in Transaction.updates {
+            for await result in StoreKit.Transaction.updates {
                 guard let self else { return }
                 if case .verified(let transaction) = result, self.ids.contains(transaction.productID) {
                     await self.refresh(); await transaction.finish()
@@ -33,7 +33,7 @@ final class MembershipStore: ObservableObject {
         var entitled = false
         // Apple's currentEntitlements includes active subscriptions and billing grace.
         // Recount from scratch so refunds and revocations remove local access.
-        for await result in Transaction.currentEntitlements {
+        for await result in StoreKit.Transaction.currentEntitlements {
             if case .verified(let transaction) = result, ids.contains(transaction.productID), transaction.revocationDate == nil, !transaction.isUpgraded { entitled = true }
         }
         active = entitled
