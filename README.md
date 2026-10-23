@@ -56,3 +56,6 @@ Equivalent npm commands: `npm run validate:curriculum` and `npm test`. GitHub Ac
 
 This is an educational prototype. Source-informed content is not institutional endorsement or evidence that the app improves financial outcomes.
 
+## Release operations
+
+Saved progress is validated on startup; damaged fields recover while valid history and legacy scores remain. Storage failures display a persistent status. CI also tests the actual self-contained artifact, checks an 800 kB size budget, reports its SHA-256 and uploads a preview artifact. Run `npm run check:release` for the browser candidate; `npm run check:production` intentionally fails until all documented signoffs have evidence. See [release runbook](docs/RELEASE-RUNBOOK.md) and `release-gates.json`. These checks do not deploy or certify the native app.

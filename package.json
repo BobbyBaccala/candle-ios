@@ -4,7 +4,11 @@
   "scripts": {
     "test": "node --test tests/*.test.cjs",
     "validate:curriculum": "node scripts/validate-curriculum.cjs",
-    "build:preview": "node scripts/build-preview.cjs"
+    "build:preview": "node scripts/build-preview.cjs",
+    "check:release": "node scripts/check-release.cjs",
+    "check:production": "node scripts/check-release.cjs --production"
   },
-  "engines": { "node": ">=20" }
+  "engines": {
+    "node": ">=20"
+  }
 }

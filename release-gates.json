@@ -1,0 +1,53 @@
+{
+  "target": "App Store production",
+  "gates": [
+    {
+      "name": "Independent curriculum review",
+      "status": "pending",
+      "evidence": "",
+      "reviewer": ""
+    },
+    {
+      "name": "Staging migrations and restore drill",
+      "status": "pending",
+      "evidence": "",
+      "reviewer": ""
+    },
+    {
+      "name": "Email callbacks, follows, blocking and deletion",
+      "status": "pending",
+      "evidence": "",
+      "reviewer": ""
+    },
+    {
+      "name": "Signed iOS build and real-device accessibility",
+      "status": "pending",
+      "evidence": "",
+      "reviewer": ""
+    },
+    {
+      "name": "Notification permission and timezone testing",
+      "status": "pending",
+      "evidence": "",
+      "reviewer": ""
+    },
+    {
+      "name": "StoreKit purchase, restore, refund and expiry",
+      "status": "pending",
+      "evidence": "",
+      "reviewer": ""
+    },
+    {
+      "name": "Published privacy/support pages and App Store disclosures",
+      "status": "pending",
+      "evidence": "",
+      "reviewer": ""
+    },
+    {
+      "name": "TestFlight acceptance and rollback rehearsal",
+      "status": "pending",
+      "evidence": "",
+      "reviewer": ""
+    }
+  ]
+}

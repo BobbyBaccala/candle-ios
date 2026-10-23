@@ -10,3 +10,10 @@ jobs:
           node-version: '22'
       - run: npm run validate:curriculum
       - run: npm test
+      - run: npm run check:release
+      - run: node scripts/build-preview.cjs dist/index.html
+      - uses: actions/upload-artifact@v4
+        with:
+          name: candle-browser-preview
+          path: dist/index.html
+          retention-days: 14
