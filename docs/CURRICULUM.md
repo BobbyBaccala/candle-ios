@@ -1,5 +1,7 @@
 # Curriculum rationale and source record
 
+Historical implementation record: counts and access rules below describe the earlier release. The current library has 1,293 open lesson sets; see [current scope, sources and launch limits](LAUNCH-PLAN.md).
+
 Editorial version: `qualitative-v1`, researched 22 October 2026. Intended audience: adolescents and young adults learning financial basics. No Wharton, OECD, CFA Institute or other institutional endorsement is claimed.
 
 ## What changed and why
@@ -79,3 +81,4 @@ Application tests execute real scripts against a small DOM stub and complete all
 The attempted in-app browser preview could not reach the local preview server (`ERR_CONNECTION_TIMED_OUT`), so **visual browser QA remains unverified**. There is no SwiftUI source or Xcode project in this checkout, and no native iOS compilation was possible. Test on a real mobile browser and the intended hosting path before release; publish `curriculum.js` with `index.html`.
 
 Before public educational release: independent finance-educator review, learner cognitive interviews, reading/accessibility testing, and a pilot with delayed retention and transfer tasks. Evaluate difficulty, distractor use and subgroup differences; revise ambiguous items rather than maximizing completion. Add fuller insurance, pensions, fraud/digital safety and jurisdiction-specific content before claiming comprehensive literacy coverage. Tax, credit reporting, deposit protection and regulatory rules are intentionally not represented as universal facts.
+

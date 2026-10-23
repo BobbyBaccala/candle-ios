@@ -1,5 +1,7 @@
 # Corporate climb and durable learning
 
+Historical implementation record: counts and access rules below describe the earlier release. The current library has 1,293 open lesson sets; see [current scope, sources and launch limits](LAUNCH-PLAN.md).
+
 ## Delivered scope and counts
 
 The base curriculum had 150 lesson slots, 47 authored banks and 141 distinct
@@ -154,3 +156,4 @@ Use consent-appropriate, minimal events without financial answers or contact
 lists, sufficient sample sizes and uncertainty intervals. Guardrails should
 include declining comprehension, early exits and frustration, not only time
 spent. Analytics collection and an experiment service are not deployed here.
+

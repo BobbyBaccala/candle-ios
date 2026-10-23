@@ -32,7 +32,8 @@ const CandleCurriculum = (() => {
   Object.assign(sources,{
     economics:{title:'CORE Econ — The Economy: choices, markets and institutions',url:'https://books.core-econ.org/the-economy-v1/book/text/01.html'},
     retirement:{title:'CFPB — Planning for retirement (US; verify local rules)',url:'https://www.consumerfinance.gov/consumer-tools/retirement/'},
-    protection:{title:'NAIC — Consumer insurance education (US; verify local rules)',url:'https://content.naic.org/consumer'},
+    protection:{title:'NAIC — How insurance works (US; verify local rules)',url:'https://content.naic.org/consumer/how-does-insurance-work'},
+    economacro:{title:'CORE Econ §15 — Inflation, unemployment and monetary policy',url:'https://books.core-econ.org/the-economy-v1/book/text/15.html'},
     banking:{title:'CFPB — Bank accounts and services',url:'https://www.consumerfinance.gov/consumer-tools/bank-accounts/'}
   });
   const banks = {};

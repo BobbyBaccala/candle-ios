@@ -4,7 +4,7 @@ The source currently in this repository is a responsive **browser app**, not an 
 
 ## Run
 
-Serve this directory with a static web server and open `index.html`. Deploy `curriculum.js` alongside it. The app keeps progress in browser local storage. Optional Supabase leaderboard configuration is in `cloud-config.js`; backend setup is in `supabase/leaderboard.sql`.
+Serve this directory with a static web server and open `index.html`. Deploy all repository scripts and styles alongside it, or use the self-contained download build below. The app keeps progress in browser local storage. Optional Supabase leaderboard configuration is in `cloud-config.js`; backend setup is in `supabase/leaderboard.sql`.
 
 ## Curriculum
 
@@ -14,11 +14,14 @@ replays cannot farm them. Free lesson rounds end with an immediately closable
 Candle+ promotion, followed by profile and league progress. Optional spaced
 review suggestions appear on Learn. Research, exact counts, score rules and
 release limitations are in [the implementation notes](docs/RETENTION-AND-LEAGUES.md).
-Apply `supabase/leagues.sql` after the existing migrations to enable shared
+Apply `supabase/leagues.sql`, then `supabase/depth-library.sql`, after the existing migrations to enable shared
 friend league scores. It has not been deployed to the live database here.
 
-- **293 lessons and 856 distinct qualitative questions**, a 507% increase in distinct questions from the previous 141. There are 1,165 placements; intentional foundation review is counted separately from new material.
-- The original 150 IDs remain intact. Another 143 five-question case files cover practical personal finance, investment analysis and trading-risk/evidence literacy. Foundation sets have three reasoning tasks; case sets have five distinct facets and styles. The interface remains tap-to-answer.
+- **1,293 open-access lesson sets**, each with five or six qualitative questions, across nine subjects. There are 7,615 placements, including 6,000 new contextual practice variants built from 100 topic models, ten business settings and 330 reusable core tasks. These are not 6,000 independent concepts or independently reviewed items.
+- The original 293 IDs and first-completion history remain intact. Three-question foundation sets become six-question mixed-concept refreshers; 143 original five-question cases remain. The interface remains tap-to-answer, with explanations and source references.
+- Corporate finance, accounting, economics, banking/credit, protection/planning and digital finance supplement the original paths. The library has search, completion filters and pagination, with no prerequisite locks.
+- Arcade games and chart labs now finish after three rounds, persist progress and require an explicit restart. Settings include the chosen Georgia/Arial typography and opt-in reminder integration. Native local scheduling and a web-push receiver are included; reliable notification delivery is not active in the downloaded HTML.
+- Read the current [launch plan and implementation limits](docs/LAUNCH-PLAN.md). Database migration order ends with `supabase/depth-library.sql`; native Swift components still need an Xcode application and real-device testing.
 - Qualitative scenarios, claim critiques and reasoning/evidence tasks use a consistent tap-to-answer interface. No lesson requires a calculator. Existing arcade math remains optional.
 - Individual explanations, qualitative hints and external source links support review. Progress, avatars, Home/Learn separation, XP, streaks, energy, ranks and the optional leaderboard remain in place.
 
@@ -49,6 +52,7 @@ node scripts/validate-curriculum.cjs
 node --test tests/*.test.cjs
 ```
 
-Equivalent npm commands: `npm run validate:curriculum` and `npm test`. GitHub Actions runs both checks. Tests execute the real application scripts against a small DOM boundary, including completion of all 293 slots; they are not visual browser or native-iOS tests.
+Equivalent npm commands: `npm run validate:curriculum` and `npm test`. GitHub Actions runs both checks. Tests execute the real application scripts against a small DOM boundary, including completion of all 1,293 slots; they are not visual browser or native-iOS tests.
 
 This is an educational prototype. Source-informed content is not institutional endorsement or evidence that the app improves financial outcomes.
+

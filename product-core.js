@@ -28,7 +28,7 @@ const CandleProduct = (() => {
   }
   function sourceGroups(curriculum) {
     return Object.entries(curriculum.sources).map(([id,source])=>({id,...source,
-      concepts:Object.entries(curriculum.banks).filter(([,b])=>b.sources.includes(id)).map(([key,b])=>({key,objective:b.objective,facets:b.rows.map(r=>r[0])}))}));
+      concepts:Object.entries(curriculum.banks).filter(([,b])=>b.sources.includes(id)).map(([key,b])=>({key:b.title||key,objective:b.objective,facets:b.rows.map(r=>r[0])}))}));
   }
   return {day,sharedStreak,validUsername,plusActive,followLink,sourceGroups};
 })();

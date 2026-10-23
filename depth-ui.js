@@ -1,6 +1,6 @@
 CandleDepth.install(lessons,CandleCurriculum,careerPaths);
 let libraryQuery='',libraryPage=0,libraryKind='all',reminderMessage='';
-state.typeface ||= 'utility';state.streakReminders ||= false;state.arcadeProgress ||= {};state.chartProgress ||= {};
+state.typeface ||= 'editorial';state.streakReminders ||= false;state.arcadeProgress ||= {};state.chartProgress ||= {};
 if(window.webkit?.messageHandlers?.candleReminders){
  window.CandleNative ||= {};
  window.CandleNative.configureStreakReminder=payload=>window.webkit.messageHandlers.candleReminders.postMessage({...payload,action:payload.enabled?'enable':'disable'});
@@ -9,6 +9,8 @@ if(window.webkit?.messageHandlers?.candleReminders){
 function applyTypeface(){document.documentElement?.setAttribute('data-typeface',['utility','system','editorial'].includes(state.typeface)?state.typeface:'utility')}
 function setTypeface(value){if(!['utility','system','editorial'].includes(value))return;state.typeface=value;save();applyTypeface();renderProfile()}
 applyTypeface();
+function refreshStreakExpiry(now=new Date()){if(state.streak>0&&!CandleReminders.active(state.last,now)){state.bestStreak=Math.max(state.bestStreak||0,state.streak);state.streak=0;save();return true}return false}
+refreshStreakExpiry();
 canStartLearningStage=function(id){return Number.isInteger(id)&&id>=0&&id<lessons.length};
 currentCareerLevel=function(){const ids=careerLessonIndices(state.path);return ids.find(id=>!state.done.includes(id))??ids[0]??0};
 leagueShield=function(index){return CandleEmblems.svg(index)};
@@ -17,7 +19,7 @@ function searchLibrary(){libraryQuery=(document.getElementById('librarySearch')?
 function showLibraryPage(value){libraryPage=Math.max(0,value);renderLearn();productScrollTop()}
 function browseTopic(id){if(!careerPaths.some(p=>p.id===id))return;state.path=id;libraryPage=0;save();renderLearn();productScrollTop()}
 renderLearn=function(){
- const all=careerLessonIndices(state.path),query=libraryQuery.toLowerCase();
+ const all=careerLessonIndices(state.path).sort((a,b)=>lessons[a].practiceVariant&&lessons[b].practiceVariant?(lessons[a].transferContext-lessons[b].transferContext)*100+(lessons[a].coreTopic-lessons[b].coreTopic):a-b),query=libraryQuery.toLowerCase();
  const filtered=all.filter(id=>(libraryKind==='all'||(libraryKind==='new'?!state.done.includes(id):state.done.includes(id)))&&(!query||(lessons[id].title+' '+lessons[id].explain).toLowerCase().includes(query)));
  const pages=Math.max(1,Math.ceil(filtered.length/12));libraryPage=Math.min(libraryPage,pages-1);
  const visible=filtered.slice(libraryPage*12,libraryPage*12+12),due=CandleLeagues.due(state.reviews).filter(id=>lessons[id]&&state.done.includes(id));
@@ -35,7 +37,9 @@ async function disableStreakReminder(){state.streakReminders=false;save();try{aw
 async function reconcileStreakReminder(){if(!state.streakReminders||!window.CandleNative?.reconcileStreakReminder)return;try{await window.CandleNative.reconcileStreakReminder({lastCompletionDay:state.last||null,streak:state.streak||0,hour:20})}catch{}}
 const depthAdvance=advance;
 advance=function(){const finishing=lesson!==null&&checked&&question===lessons[lesson].qs.length-1;depthAdvance();if(finishing&&lesson===null)void reconcileStreakReminder()};
-document.addEventListener('visibilitychange',()=>{if(!document.hidden)void reconcileStreakReminder()});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){const changed=refreshStreakExpiry();void reconcileStreakReminder();if(changed&&lesson===null)render()}});
+const depthLessonRender=renderLesson;
+renderLesson=function(){depthLessonRender();if(lesson!==null){const q=lessons[lesson].qs[question];if(q.taskPrompt)app.innerHTML=app.innerHTML.replace('<h3>'+esc(q.q)+'</h3>','<h3>'+esc(q.taskPrompt)+'</h3>')}};
 const depthStart=start;
 start=function(index){if(!canStartLearningStage(index))return;depthStart(index)};
 function arcadeState(){const g=games.find(g=>g.id===game)||games[0];let run=state.arcadeProgress[g.id];if(!run||!Array.isArray(run.answers))run=state.arcadeProgress[g.id]={answers:[]};return {g,run}}

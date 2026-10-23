@@ -7,6 +7,7 @@ const CandleReminders=(()=>{
   const target=new Date(y,m-1,d+1,20),expires=new Date(y,m-1,d+2,0);
   return target>now?{at:target.toISOString(),expires:expires.toISOString(),localDay:day(target)}:null;
  }
- return {day,next};
+ function active(last,now=new Date()){const prior=new Date(now.getFullYear(),now.getMonth(),now.getDate()-1,12);return last===day(now)||last===day(prior)}
+ return {day,next,active};
 })();
 if(typeof module!=='undefined')module.exports=CandleReminders;

@@ -45,6 +45,10 @@ test('8pm reminder is on the expiry day, suppressed after expiry, and calendar b
  assert.equal(R.next('2026-02-31',2,now),null);
  const leap=R.next('2028-02-28',2,new Date(2028,1,28,18));assert.equal(new Date(leap.at).getDate(),29);
 });
+test('expired personal streaks clear on reopening while best history is retained',()=>{
+ const a=boot({streak:9,last:'2020-01-01',xp:40,done:[30]});assert.equal(a.run('state.streak'),0);assert.equal(a.run('state.bestStreak'),9);
+ const date=new Date(2026,9,23,0,0);assert.equal(R.active('2026-10-22',date),true);assert.equal(R.active('2026-10-21',date),false);
+});
 test('no native bridge means no fake notification opt-in or browser permission request',async()=>{
  const a=boot();a.run("go('Profile');openProfilePage('settings')");await a.run('enableStreakReminder()');
  assert.equal(a.run('state.streakReminders'),false);assert.match(a.elements.app.innerHTML,/No permission or delivery was enabled/);

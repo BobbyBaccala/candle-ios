@@ -30,12 +30,15 @@ const CandleDepth=(()=>{
    l.sourceIds=[...new Set([...l.sourceIds,...C.banks[second].sources])];l.curriculumVersion='qualitative-v2';
   }
   for(const [mi,m] of models.entries())for(const [ci,c] of contexts.entries()){
-   const id=lessons.length,context='Refresher focus: '+m.objective+' Workplace transfer: '+c.situation;
+   const refs=m.path==='economics'&&/inflation|nominal|central-bank|fiscal|cycles|exchange|forecasts/i.test(m.title)?[...new Set(['economacro',...m.refs])]:m.refs;
+   const id=lessons.length,context=m.objective+' '+c.situation;
    const topicConcept='depth-topic-'+mi,contextConcept='depth-context-'+ci;
    const prefix=m.title+' · '+c.title+' — ';
    const topicRows=m.rows.map(r=>[prefix+r[0],...r.slice(1)]),contextRows=c.rows.map(r=>[prefix+r[0],...r.slice(1)]);
-   const qs=[...questions(topicRows,topicConcept,id,context,m.refs,C),...questions(contextRows,contextConcept,id,context,['finance','cashflow','capital'],C).map((q,i)=>({...q,format:['decision','diagnosis','counterfactual'][i]}))].map(q=>({...q,taskPrompt:q.q.slice(prefix.length)}));
-   lessons.push({unit:paths.find(p=>p.id===m.path).name,career:m.path,title:m.title+' · '+c.title,explain:context,caseContext:context,sourceIds:[...new Set([...m.refs,'finance','cashflow','capital'])],qs,curriculumVersion:'depth-v1',practiceVariant:true,coreTopic:mi,transferContext:ci});
+   const qs=[...questions(topicRows,topicConcept,id,context,refs,C),...questions(contextRows,contextConcept,id,context,['finance','cashflow','capital'],C).map((q,i)=>({...q,format:['decision','diagnosis','counterfactual'][i]}))].map(q=>({...q,taskPrompt:q.q.slice(prefix.length)}));
+   Object.assign(C.banks[topicConcept],{title:m.title,objective:m.objective});
+   Object.assign(C.banks[contextConcept],{title:c.title,objective:c.situation});
+   lessons.push({unit:paths.find(p=>p.id===m.path).name,career:m.path,title:m.title+' · '+c.title,explain:context,caseContext:context,sourceIds:[...new Set([...refs,'finance','cashflow','capital'])],qs,curriculumVersion:'depth-v1',practiceVariant:true,coreTopic:mi,transferContext:ci});
   }
  }
  return {models,contexts,paths,pack,contextPack,install};
