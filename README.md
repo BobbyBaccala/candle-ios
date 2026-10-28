@@ -1,6 +1,6 @@
 # Candle — Learn trading, one day at a time
 
-An educational game for financial literacy: short interactive lessons, risk management, chart reading and trading math. No real-money trading.
+An educational game for financial literacy: short concept lessons on money, investing and trading. No real-money trading.
 
 ## What's in this repo
 The working app is currently a **single-page web prototype**, designed phone-first so it can be added to an iPhone home screen.
@@ -8,14 +8,16 @@ The working app is currently a **single-page web prototype**, designed phone-fir
 | File | What it is |
 | --- | --- |
 | `index.html` | The whole app: lessons, path map, arcade, chart lab, avatar creator, energy, leaderboard client |
+| `concepts.js` | The 360 concept questions for the three career paths (correct answer listed first; the app shuffles) |
 | `cloud-config.js` | Supabase project URL and **publishable/anon key only** (never a service-role key) |
 | `supabase/leaderboard.sql` | Friends-leaderboard schema; run once in the Supabase SQL editor |
 
 ### Features
-- **Four learning paths** (150 stages): Market Basics (6 worlds × 5 hand-written lessons), Personal Finance, Long-Term Investing and Day Trading (4 tiers × 10 generated lessons each)
-- Multiple-choice and numeric questions, hints that never reveal the answer, review of missed questions
+- **Four learning paths** (150 stages): Market Basics (6 worlds × 5 lessons), Personal Finance, Long-Term Investing and Day Trading (4 tiers × 10 topics each)
+- Concept-first lessons: a short intro, 3 multiple-choice questions and a "why" after each answer. Tiers move from basics → how it works → trade-offs → judgment and pitfalls. Path content lives in `concepts.js`.
+- Hints that never reveal the answer, review of missed questions
 - XP, daily streaks, rank ladder, energy (15 max, 1 back every 30 min)
-- Arcade: six practice calculators plus an interactive candlestick chart lab
+- Arcade (optional): six practice calculators plus an interactive candlestick chart lab
 - Avatar creator
 - Optional friends leaderboard on Supabase (magic-link sign-in, friend codes, weekly + lifetime XP)
 
