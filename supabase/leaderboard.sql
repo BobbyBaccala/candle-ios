@@ -70,12 +70,12 @@ end $$;
 -- IMPORTANT: Stage completion is client-asserted, not yet independently quiz-verified.
 create or replace function public.candle_complete_stage(p_stage_id integer,p_perfect boolean default false)
 returns integer language plpgsql security definer set search_path=public as $$
-declare points integer:=case when p_perfect then 40 else 25 end; inserted integer;
+declare award_points integer:=case when p_perfect then 40 else 25 end; inserted integer;
 begin
  if auth.uid() is null then raise exception 'Sign in required'; end if;
  if p_stage_id not between 0 and 149 then raise exception 'Invalid stage'; end if;
- insert into candle_xp_events(user_id,stage_id,points) values(auth.uid(),p_stage_id,points)
- on conflict do nothing returning points into inserted;
+ insert into candle_xp_events(user_id,stage_id,points) values(auth.uid(),p_stage_id,award_points)
+ on conflict do nothing returning candle_xp_events.points into inserted;
  if inserted is not null then
   insert into candle_scores(user_id,lifetime_xp) values(auth.uid(),inserted)
   on conflict(user_id) do update set lifetime_xp=candle_scores.lifetime_xp+excluded.lifetime_xp,updated_at=now();

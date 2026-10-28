@@ -1,0 +1,70 @@
+name: Native and database acceptance
+on:
+  push:
+    branches: [main]
+  pull_request:
+concurrency:
+  group: acceptance-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+permissions:
+  contents: read
+jobs:
+  database:
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: disposable-ci-only
+          POSTGRES_DB: candle_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      PGHOST: localhost
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: disposable-ci-only
+      PGDATABASE: candle_test
+    steps:
+      - uses: actions/checkout@v4
+      - run: psql -v ON_ERROR_STOP=1 -f scripts/ci/auth-contract.sql
+      - name: Apply migrations in release order
+        run: |
+          for file in leaderboard social-plus leagues; do
+            psql -v ON_ERROR_STOP=1 -f "supabase/$file.sql"
+          done
+      - name: Run transaction-isolated acceptance suites
+        run: |
+          for file in social-plus leagues; do
+            psql -v ON_ERROR_STOP=1 -f "supabase/tests/$file.sql"
+          done
+      - name: Upgrade to expanded library and check deletion cascades
+        run: |
+          psql -v ON_ERROR_STOP=1 -f supabase/depth-library.sql
+          psql -v ON_ERROR_STOP=1 -f supabase/tests/depth-library.sql
+          psql -v ON_ERROR_STOP=1 -f supabase/tests/deletion.sql
+  ios:
+    timeout-minutes: 20
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node scripts/export-ios.cjs
+      - run: brew install xcodegen
+      - run: xcodegen generate --spec ios/project.yml
+      - name: Build and test unsigned simulator candidate
+        run: |
+          DEVICE=$(xcrun simctl list devices available -j | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const d=Object.values(JSON.parse(s).devices).flat().find(d=>d.name.startsWith('iPhone'));if(!d)process.exit(1);process.stdout.write(d.udid)})")
+          xcodebuild test -project ios/Candle.xcodeproj -scheme Candle -destination "platform=iOS Simulator,id=$DEVICE" CODE_SIGNING_ALLOWED=NO -resultBundlePath ios/TestResults.xcresult
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: candle-ios-test-results
+          path: ios/TestResults.xcresult
