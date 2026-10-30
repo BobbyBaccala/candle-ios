@@ -57,8 +57,10 @@ final class NativeHabitsTests: XCTestCase {
         XCTAssertEqual(store.lessons.count, 1293, store.libraryLoadError ?? "no load error recorded")
         XCTAssertNil(store.errorMessage, store.libraryLoadError ?? "")
     }
-    func testCurriculumIsInTheAppBundle() {
-        XCTAssertNotNil(Bundle.main.url(forResource: "curriculum", withExtension: "json"),
-                        "curriculum.json missing from \(Bundle.main.bundlePath)")
+    func testRequiredResourcesAreInTheAppBundle() {
+        for (name, ext) in [("curriculum", "json"), ("PrivacyInfo", "xcprivacy"), ("LaunchConfiguration", "json")] {
+            XCTAssertNotNil(Bundle.main.url(forResource: name, withExtension: ext),
+                            "\(name).\(ext) missing from \(Bundle.main.bundlePath)")
+        }
     }
 }
