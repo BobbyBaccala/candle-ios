@@ -37,6 +37,8 @@ final class LearningStore: ObservableObject {
     @Published var lessons: [LearningLesson] = []
     @Published var progress = LearningProgress()
     @Published var errorMessage: String?
+    /// Technical reason the bundled library failed to load (for tests and diagnostics; never shown to learners).
+    private(set) var libraryLoadError: String?
     private let defaults: UserDefaults
     private let scheduler = StreakReminderScheduler()
     init(defaults: UserDefaults = .standard) {
@@ -49,7 +51,10 @@ final class LearningStore: ObservableObject {
             guard let url = Bundle.main.url(forResource: "curriculum", withExtension: "json") else { throw CocoaError(.fileNoSuchFile) }
             lessons = try JSONDecoder().decode([LearningLesson].self, from: Data(contentsOf: url))
             guard !lessons.isEmpty, lessons.allSatisfy({ $0.questions.count >= 5 && $0.questions.allSatisfy { $0.options.indices.contains($0.correct) } }) else { throw CocoaError(.fileReadCorruptFile) }
-        } catch { errorMessage = "The learning library could not be opened. Please reinstall the beta or contact its organizer." }
+        } catch {
+            libraryLoadError = "\(error) [bundle: \(Bundle.main.bundlePath)]"
+            errorMessage = "The learning library could not be opened. Please reinstall the beta or contact its organizer."
+        }
     }
     func persist() {
         do { defaults.set(try JSONEncoder().encode(progress), forKey: "native.progress.v1") }

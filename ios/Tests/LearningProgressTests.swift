@@ -54,7 +54,11 @@ final class NativeHabitsTests: XCTestCase {
     }
     @MainActor func testEntireBundledLibraryLoads() {
         let store = LearningStore(defaults: UserDefaults(suiteName: UUID().uuidString)!)
-        XCTAssertEqual(store.lessons.count, 1293)
-        XCTAssertNil(store.errorMessage)
+        XCTAssertEqual(store.lessons.count, 1293, store.libraryLoadError ?? "no load error recorded")
+        XCTAssertNil(store.errorMessage, store.libraryLoadError ?? "")
+    }
+    func testCurriculumIsInTheAppBundle() {
+        XCTAssertNotNil(Bundle.main.url(forResource: "curriculum", withExtension: "json"),
+                        "curriculum.json missing from \(Bundle.main.bundlePath)")
     }
 }
