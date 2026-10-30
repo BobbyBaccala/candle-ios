@@ -54,7 +54,13 @@ final class NativeHabitsTests: XCTestCase {
     }
     @MainActor func testEntireBundledLibraryLoads() {
         let store = LearningStore(defaults: UserDefaults(suiteName: UUID().uuidString)!)
-        XCTAssertEqual(store.lessons.count, 1293)
-        XCTAssertNil(store.errorMessage)
+        XCTAssertEqual(store.lessons.count, 1293, store.libraryLoadError ?? "no load error recorded")
+        XCTAssertNil(store.errorMessage, store.libraryLoadError ?? "")
+    }
+    func testRequiredResourcesAreInTheAppBundle() {
+        for (name, ext) in [("curriculum", "json"), ("PrivacyInfo", "xcprivacy"), ("LaunchConfiguration", "json")] {
+            XCTAssertNotNil(Bundle.main.url(forResource: name, withExtension: ext),
+                            "\(name).\(ext) missing from \(Bundle.main.bundlePath)")
+        }
     }
 }

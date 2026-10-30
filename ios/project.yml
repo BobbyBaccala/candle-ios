@@ -21,8 +21,12 @@ targets:
     sources:
       - Sources
       - ../native/StreakReminderScheduler.swift
-    resources:
-      - Resources
+      # XcodeGen has no target-level `resources:` key; resources are sources
+      # with a resources build phase. The old key was silently ignored, so
+      # curriculum.json, PrivacyInfo.xcprivacy and LaunchConfiguration.json
+      # were never copied into the app.
+      - path: Resources
+        buildPhase: resources
   CandleTests:
     type: bundle.unit-test
     platform: iOS
