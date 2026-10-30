@@ -4,12 +4,10 @@
 (function(){
  'use strict';
 
- /* 1. Streaks: the badge kept showing an old streak (e.g. "9 days") after
-    days without practice, and replaying a lesson didn't count for today. */
+ /* 1. Streaks: replaying a lesson counts toward today's streak (first
+    completions already did). Expiry is handled by refreshStreakExpiry() in
+    depth-ui.js, which also records bestStreak, so it isn't repeated here. */
  function dayKey(offset){const d=new Date();d.setDate(d.getDate()+(offset||0));return d.toLocaleDateString('en-CA')}
- function expireStreak(){
-  if(state.streak>0&&state.last&&state.last!==dayKey(0)&&state.last!==dayKey(-1)){state.streak=0;save()}
- }
  const awardBase=award;
  award=function(id){
   const first=awardBase(id);
@@ -18,9 +16,12 @@
  };
 
  /* 2. Leaderboard: stages finished before signing in were never sent to the
-    server, and renaming your trader never changed your leaderboard name. */
+    server, and renaming your trader never changed your leaderboard name.
+    Each stage is sent on its own: a stage the server rejects (for example
+    IDs above 149 before supabase/depth-library.sql is applied) is skipped
+    for this session instead of blocking every stage after it. */
  state.cloudSynced=state.cloudSynced&&typeof state.cloudSynced==='object'?state.cloudSynced:{};
- let catchingUp=false;
+ let catchingUp=false;const rejectedThisSession=new Set();
  function syncedIds(){const k=cloudUser&&cloudUser.id;if(!k)return null;if(!Array.isArray(state.cloudSynced[k]))state.cloudSynced[k]=[];return state.cloudSynced[k]}
  async function cloudCatchUp(){
   if(typeof cloud==='undefined'||!cloud||!cloudUser||catchingUp)return false;
@@ -31,15 +32,16 @@
     await cloudCall('candle_set_name',{p_name:want});cloudProfile.display_name=want;changed=true;
    }
    const synced=syncedIds()||[];
-   const todo=(state.done||[]).filter(id=>Number.isInteger(id)&&id>=0&&id<lessons.length&&!synced.includes(id));
+   const todo=(state.done||[]).filter(id=>Number.isInteger(id)&&id>=0&&id<lessons.length&&!synced.includes(id)&&!rejectedThisSession.has(id));
+   let failed=0,lastError='';
    for(const id of todo){
     const sc=state.lessonScores&&state.lessonScores[id],perfect=Boolean(sc&&sc.total&&sc.correct===sc.total);
-    await cloudCall('candle_complete_stage',{p_stage_id:id,p_perfect:perfect});
-    synced.push(id);changed=true;
+    try{await cloudCall('candle_complete_stage',{p_stage_id:id,p_perfect:perfect});synced.push(id);changed=true}
+    catch(e){rejectedThisSession.add(id);failed++;lastError=e.message}
    }
-   if(changed)save();
+   if(failed)cloudError=failed+' earlier stage'+(failed===1?'':'s')+' could not be added to the leaderboard ('+lastError+').';
   }catch(e){cloudError='Score sync failed: '+e.message}
-  finally{catchingUp=false}
+  finally{if(changed)save();catchingUp=false}
   return changed;
  }
  const refreshBase=cloudRefresh;
@@ -60,7 +62,6 @@
     below the fold. */
  const renderBase=render;
  render=function(){
-  expireStreak();
   renderBase.apply(this,arguments);
   try{
    if(lesson!==null&&checked&&typeof window.innerHeight==='number'){
