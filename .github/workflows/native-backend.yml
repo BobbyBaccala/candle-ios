@@ -50,7 +50,7 @@ jobs:
           psql -v ON_ERROR_STOP=1 -f supabase/tests/deletion.sql
   ios:
     timeout-minutes: 20
-    runs-on: macos-15
+    runs-on: macos-26
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
